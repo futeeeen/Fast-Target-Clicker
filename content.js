@@ -156,28 +156,37 @@ function scheduleActivationScan() {
   }, Math.max(0, waitMs));
 }
 
-function scanAndClick(options = {}) {
-  if (!config.enabled && !options.ignoreEnabled) return;
-  if (config.workflowEnabled && config.workflowSteps.trim()) {
-    runWorkflow(options);
-    return;
+async function scanAndClick(options = {}) {
+  if (!config.enabled && !options.ignoreEnabled) {
+    return { ok: false, reason: "disabled" };
   }
 
-  if (config.clickOnce && hasClicked) return;
+  if (config.workflowEnabled && config.workflowSteps.trim()) {
+    return runWorkflow(options);
+  }
+
+  if (config.clickOnce && hasClicked) {
+    return { ok: true, clicked: false, reason: "already-clicked" };
+  }
+
   if (!options.force && isBeforeStartTime()) {
     scheduleActivationScan();
-    return;
+    return { ok: true, clicked: false, reason: "waiting-start-time" };
   }
 
   const target = findTarget();
-  if (!target) return;
+  if (!target) {
+    return { ok: true, clicked: false, reason: "target-not-found" };
+  }
 
   if (pendingClickTimer) clearTimeout(pendingClickTimer);
 
   if (config.delayMs > 0) {
     pendingClickTimer = setTimeout(() => clickTarget(target), config.delayMs);
+    return { ok: true, clicked: true, delayed: true };
   } else {
     clickTarget(target);
+    return { ok: true, clicked: true };
   }
 }
 
@@ -260,48 +269,70 @@ function setCheckbox(element, checked) {
 async function runWorkflow(options = {}) {
   if (!options.force && isBeforeStartTime()) {
     scheduleActivationScan();
-    return;
+    return { ok: true, clicked: false, reason: "waiting-start-time" };
   }
 
   const steps = parseWorkflowSteps();
-  if (!steps.length) return;
+  if (!steps.length) {
+    return { ok: false, clicked: false, reason: "workflow-empty" };
+  }
 
   const index = await getWorkflowIndex();
   const step = steps[index];
-  if (!step) return;
+  if (!step) {
+    return { ok: true, clicked: false, reason: "workflow-finished", index, total: steps.length };
+  }
 
   const type = step.type || "click";
   const element = findElementForStep(step);
-  if (!element) return;
+  if (!element) {
+    return {
+      ok: true,
+      clicked: false,
+      reason: "step-target-not-found",
+      index,
+      total: steps.length,
+      step
+    };
+  }
 
   if (type === "select") {
-    if (!(element instanceof HTMLSelectElement)) return;
-    if (!selectOption(element, step)) return;
+    if (!(element instanceof HTMLSelectElement)) {
+      return { ok: true, clicked: false, reason: "step-target-not-select", index, total: steps.length, step };
+    }
+    if (!selectOption(element, step)) {
+      return { ok: true, clicked: false, reason: "select-option-not-found", index, total: steps.length, step };
+    }
     await setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
-    return;
+    return { ok: true, clicked: true, action: "select", index, nextIndex: index + 1, total: steps.length, step };
   }
 
   if (type === "check") {
-    if (!setCheckbox(element, step.checked !== false)) return;
+    if (!setCheckbox(element, step.checked !== false)) {
+      return { ok: true, clicked: false, reason: "step-target-not-checkbox", index, total: steps.length, step };
+    }
     await setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
-    return;
+    return { ok: true, clicked: true, action: "check", index, nextIndex: index + 1, total: steps.length, step };
   }
 
   if (type === "fill") {
-    if (!("value" in element)) return;
+    if (!("value" in element)) {
+      return { ok: true, clicked: false, reason: "step-target-not-fillable", index, total: steps.length, step };
+    }
     setNativeValue(element, step.value || "");
     element.dispatchEvent(new Event("input", { bubbles: true }));
     element.dispatchEvent(new Event("change", { bubbles: true }));
     await setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
-    return;
+    return { ok: true, clicked: true, action: "fill", index, nextIndex: index + 1, total: steps.length, step };
   }
 
   await setWorkflowIndex(index + 1);
   clickTarget(element, { ignoreClickOnce: true });
   setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 100));
+  return { ok: true, clicked: true, action: "click", index, nextIndex: index + 1, total: steps.length, step };
 }
 
 function startObserver() {
@@ -348,14 +379,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message?.type === "fast-clicker-scan") {
-    scanAndClick({ force: true });
-    sendResponse({ ok: true, clicked: hasClicked });
+    scanAndClick({ force: true }).then(sendResponse);
+    return true;
   }
 
   if (message?.type === "fast-clicker-test") {
     hasClicked = false;
-    scanAndClick({ force: true, ignoreEnabled: true });
-    sendResponse({ ok: true, clicked: hasClicked });
+    scanAndClick({ force: true, ignoreEnabled: true }).then(sendResponse);
+    return true;
   }
 
   if (message?.type === "fast-clicker-reset") {

@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_17:40:56
+* 修正進階多步驟流程測試回報太早的問題，現在會等待目前步驟實際執行結果後再回傳狀態。
+* 「立刻測試」現在會顯示目前第幾步與卡住原因，方便判斷 selector、頁面或流程進度問題。
+* 「載入範例」會同步重設流程進度，避免沿用上一輪測試做到中段或結束的狀態。
+* Validation: ran `node --check content.js` and `node --check popup.js`.
+
 ## 2026.05.24_17:33:26
 * 建立 Fast Target Clicker Chrome/Edge 擴充功能，可用 CSS selector、按鈕文字、aria-label/title/name 設定目標並自動點擊。
 * 新增指定開始時間與倒數功能，時間到後才開始掃描並點擊目標。

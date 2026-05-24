@@ -173,11 +173,13 @@ document.querySelector("#test").addEventListener("click", async () => {
   try {
     const result = await sendToActiveTab({ type: "fast-clicker-test" });
     if (result?.clicked) {
-      setStatus("已忽略倒數並成功點擊");
+      const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
+      setStatus(`已執行${stepText}`);
     } else if (result?.ok) {
-      setStatus("已測試，但沒有找到目標");
+      const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
+      setStatus(`${stepText} 沒找到目標：${result.reason || "unknown"}`);
     } else {
-      setStatus("目前頁面無法測試");
+      setStatus(result?.reason || "目前頁面無法測試");
     }
   } catch {
     setStatus("請重新整理頁面後再測試");
@@ -189,7 +191,7 @@ document.querySelector("#clearTime").addEventListener("click", async () => {
   await save();
 });
 
-document.querySelector("#sampleWorkflow").addEventListener("click", () => {
+document.querySelector("#sampleWorkflow").addEventListener("click", async () => {
   fields.workflowEnabled.checked = true;
   fields.workflowSteps.value = JSON.stringify([
     { type: "click", selector: "#firstButton" },
@@ -200,7 +202,8 @@ document.querySelector("#sampleWorkflow").addEventListener("click", () => {
     { type: "check", selector: "#agreeTerms" },
     { type: "click", selector: "#finishButton" }
   ], null, 2);
-  setStatus("已載入測試網站範例");
+  await chrome.storage.local.set({ workflowIndex: 0 });
+  setStatus("已載入範例並重設進度");
 });
 
 document.querySelector("#resetWorkflow").addEventListener("click", async () => {
