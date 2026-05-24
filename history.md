@@ -1,5 +1,10 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_00:31:34
+* 新增勝利獎盃風格的擴充功能 icon，提供 16/32/48/128 px PNG。
+* 更新 manifest 的 extension icon 與 action toolbar icon 設定。
+* Validation: parsed `manifest.json` and confirmed generated icon files.
+
 ## 2026.05.25_00:27:39
 * 簡化 popup 介面，移除較少使用的單步 selector/text/aria/checkbox/delay 欄位。
 * popup 現在聚焦在指定開始時間、多步驟 JSON、起始步驟、流程狀態與操作按鈕。
