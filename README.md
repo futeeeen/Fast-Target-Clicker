@@ -8,7 +8,9 @@
 2. 進入 `chrome://extensions` 或 `edge://extensions`。
 3. 開啟「開發人員模式」。
 4. 選「載入未封裝項目」。
-5. 選擇這個資料夾：`C:\futen\Project\Auto-click`
+5. 選擇這個資料夾：`C:\futen\Project\Auto-click\extension`
+
+`extension` 資料夾就是產品安裝包。要分享給別人安裝時，只需要提供這個資料夾即可。
 
 ## 開啟右側工具面板
 

@@ -17,6 +17,7 @@
         <a href="#features">功能</a>
         <a href="#workflow">流程</a>
         <a href="#examples">範例</a>
+        <a href="#install">安裝</a>
         <a href="#guide">使用方式</a>
       </nav>
     </header>
@@ -29,7 +30,7 @@
           <p class="lede">Fast Target Clicker 讓你用 JSON 設定頁面操作：等待目標出現、依文字篩選、選擇下拉選單、勾選 checkbox，並在右側 Side Panel 追蹤目前執行到哪一步。</p>
           <div class="hero-actions">
             <a class="button primary" href="#examples">看設定範例</a>
-            <a class="button secondary" href="#guide">開始使用</a>
+            <a class="button secondary" href="#install">安裝方式</a>
           </div>
         </div>
 
@@ -147,6 +148,65 @@
             </div>
           </li>
         </ol>
+      </section>
+
+      <section id="install" class="section install-section">
+        <div class="section-heading">
+          <p class="eyebrow">Install</p>
+          <h2>只要載入 extension 資料夾就能安裝</h2>
+          <p>專案根目錄保留文件、產品介紹頁與測試頁；真正的擴充功能本體集中在 <code>extension</code> 資料夾。分享或安裝時只需要這個資料夾。</p>
+        </div>
+        <div class="install-layout">
+          <ol class="install-steps">
+            <li>
+              <span>1</span>
+              <p>打開 Chrome 或 Edge，進入 <code>chrome://extensions</code> 或 <code>edge://extensions</code>。</p>
+            </li>
+            <li>
+              <span>2</span>
+              <p>開啟「開發人員模式」，點選「載入未封裝項目」。</p>
+            </li>
+            <li>
+              <span>3</span>
+              <p>選擇專案內的 <code>extension</code> 資料夾。</p>
+            </li>
+            <li>
+              <span>4</span>
+              <p>安裝後點工具列圖示，工具會在瀏覽器右側 Side Panel 開啟。</p>
+            </li>
+          </ol>
+          <div class="folder-card" aria-label="資料夾結構">
+            <strong>專案結構</strong>
+            <pre><code>Fast-Target-Clicker/
+├─ extension/      可安裝的擴充功能本體
+├─ docs/           產品介紹網站
+├─ test-site/      測試流程頁
+├─ README.md
+└─ history.md</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section schedule-section">
+        <div class="section-heading narrow">
+          <p class="eyebrow">Scheduled run</p>
+          <h2>指定時間一到，自動觸發同一套流程</h2>
+          <p>在右側面板設定「指定開始時間」並儲存後，工具會用背景排程記住目標分頁。時間到時，它會等同按下「立刻測試」，從設定的起始步驟開始執行 JSON 流程。</p>
+        </div>
+        <div class="schedule-grid">
+          <article>
+            <h3>先開好目標頁</h3>
+            <p>排程會對儲存設定時記錄的分頁觸發，因此正式使用前先把目標頁面開好並停在正確起點。</p>
+          </article>
+          <article>
+            <h3>先用立刻測試確認</h3>
+            <p>手動測試會使用同一份 JSON 與同一個起始步驟。測得過，指定時間觸發才有可預期結果。</p>
+          </article>
+          <article>
+            <h3>狀態區會顯示卡點</h3>
+            <p>執行中會顯示目前第幾步、目標條件與逾時結果，方便調整 waitForMs、pollMs 或 selector。</p>
+          </article>
+        </div>
       </section>
 
       <section id="examples" class="section examples-section">

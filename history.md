@@ -1,5 +1,12 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_01:10:48
+* 將可安裝的擴充功能本體整理到 `extension` 資料夾，根目錄保留文件、產品介紹頁與測試資源。
+* 新增 `extension/README.md`，讓使用者拿到產品資料夾後可直接依說明用「載入未封裝項目」安裝。
+* 更新產品介紹頁，新增安裝方式、專案結構與指定時間觸發流程說明。
+* 更新根目錄 README，將安裝路徑改為 `C:\futen\Project\Auto-click\extension`。
+* Validation: parsed `extension/manifest.json`, ran `node --check` for extension scripts and docs script, and reviewed local docs rendering.
+
 ## 2026.05.25_00:47:22
 * 新增 `docs` 產品介紹頁，包含響應式首頁、功能說明、操作流程、欄位指南與互動式 JSON 範例切換。
 * 將 GitHub Pages workflow 部署來源從 `test-site` 改為 `docs`，讓 Pages 首頁成為正式產品介紹頁。
