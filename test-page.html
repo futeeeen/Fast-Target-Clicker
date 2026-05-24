@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fast Target Clicker Test</title>
+    <style>
+      body {
+        margin: 0;
+        color: #172033;
+        background: #f4f6f8;
+        font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        max-width: 720px;
+        margin: 10vh auto;
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 16px;
+      }
+
+      button {
+        min-height: 44px;
+        border: 0;
+        border-radius: 6px;
+        padding: 0 18px;
+        color: #ffffff;
+        background: #276ef1;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      #target {
+        margin-top: 20px;
+      }
+
+      #log {
+        min-height: 28px;
+        margin-top: 16px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>測試頁</h1>
+      <p>按下「產生目標按鈕」後，頁面會延遲 1 秒插入目標按鈕。</p>
+      <button id="spawn" type="button">產生目標按鈕</button>
+      <div id="target"></div>
+      <p id="log"></p>
+    </main>
+
+    <script>
+      document.querySelector("#spawn").addEventListener("click", () => {
+        document.querySelector("#target").textContent = "等待中...";
+        setTimeout(() => {
+          document.querySelector("#target").innerHTML =
+            '<button class="race-target" aria-label="race-go" type="button">立即搶點</button>';
+          document.querySelector(".race-target").addEventListener("click", () => {
+            document.querySelector("#log").textContent = "已點擊成功";
+          });
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

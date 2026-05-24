@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Fast Target Clicker",
+  "version": "1.0.0",
+  "description": "Configurable auto-click helper for quickly clicking a target button when it appears.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Fast Target Clicker"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

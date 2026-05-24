@@ -1,0 +1,149 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: #1b2533;
+  background: #eef2f6;
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  align-items: center;
+  padding: 28px;
+}
+
+.panel {
+  width: min(100%, 720px);
+  margin: 0 auto;
+}
+
+.panel.wide {
+  width: min(100%, 980px);
+}
+
+.step {
+  margin: 0 0 8px;
+  color: #475467;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.note {
+  max-width: 680px;
+  margin: 0 0 20px;
+  color: #516173;
+}
+
+button,
+.quick-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 18px;
+  color: #ffffff;
+  background: #1f6feb;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+button:focus-visible,
+.quick-button:focus-visible,
+.seat-item:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(31, 111, 235, 0.28);
+  outline-offset: 2px;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 52px;
+  margin-top: 18px;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.seat-item {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #cad3df;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #222f3f;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.seat-item:hover {
+  border-color: #1f6feb;
+  background: #f7fbff;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 260px);
+  margin: 20px 0 14px;
+  font-weight: 700;
+}
+
+select {
+  min-height: 42px;
+  border: 1px solid #b8c3d2;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: #ffffff;
+  font: inherit;
+}
+
+.checkbox-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  font-weight: 700;
+}
+
+.checkbox-line input {
+  width: 18px;
+  height: 18px;
+}
+
+.result {
+  min-height: 28px;
+  margin: 16px 0 0;
+  font-weight: 700;
+}
+
+.result[data-state="success"] {
+  color: #087443;
+}
+
+.result[data-state="error"] {
+  color: #b42318;
+}

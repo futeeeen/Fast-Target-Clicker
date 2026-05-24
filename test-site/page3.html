@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auto Click Test - Final</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel">
+        <p class="step">Step 3</p>
+        <h1>最後設定</h1>
+        <label class="field">
+          數量
+          <select id="ticketCount" name="ticketCount">
+            <option value="">請選擇</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </label>
+
+        <label class="checkbox-line">
+          <input id="agreeTerms" name="agreeTerms" type="checkbox">
+          我已確認資料
+        </label>
+
+        <button id="finishButton" class="primary" type="button">完成測試</button>
+        <p id="result" class="result" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script>
+      document.querySelector("#finishButton").addEventListener("click", () => {
+        const count = document.querySelector("#ticketCount").value;
+        const checked = document.querySelector("#agreeTerms").checked;
+        const result = document.querySelector("#result");
+
+        if (!count || !checked) {
+          result.textContent = "尚未完成：請選數量並勾選確認。";
+          result.dataset.state = "error";
+          return;
+        }
+
+        result.textContent = `完成：選擇 ${count} 張，已勾選確認。`;
+        result.dataset.state = "success";
+      });
+    </script>
+  </body>
+</html>

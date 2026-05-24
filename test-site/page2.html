@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auto Click Test - Seats</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel wide">
+        <p class="step">Step 2</p>
+        <h1>座位選擇</h1>
+        <button id="secondButton" class="primary" type="button">第二個按鈕</button>
+        <p class="note">按下第二個按鈕後會顯示很多個 <code>div.seat-item</code>，任一個都會前往第三頁。</p>
+        <div id="seatGrid" class="seat-grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script>
+      const labels = [
+        "A區 01 排 08 號",
+        "A區 01 排 09 號",
+        "A區 02 排 02 號",
+        "B區 03 排 11 號",
+        "B區 03 排 12 號",
+        "C區 05 排 01 號",
+        "C區 05 排 02 號",
+        "D區 08 排 16 號",
+        "E區 09 排 03 號",
+        "F區 10 排 20 號",
+        "自由席 入口左側",
+        "自由席 入口右側"
+      ];
+
+      const grid = document.querySelector("#seatGrid");
+      document.querySelector("#secondButton").addEventListener("click", () => {
+        grid.innerHTML = "";
+
+        labels.forEach((label, index) => {
+          const seat = document.createElement("div");
+          seat.className = "seat-item";
+          seat.dataset.seatId = String(index + 1);
+          seat.tabIndex = 0;
+          seat.textContent = label;
+          seat.addEventListener("click", () => {
+            window.location.href = "page3.html";
+          });
+          seat.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              seat.click();
+            }
+          });
+          grid.append(seat);
+        });
+      });
+    </script>
+  </body>
+</html>

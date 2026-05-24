@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fast Target Clicker</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Fast Target Clicker</h1>
+        <label class="switch">
+          <input id="enabled" type="checkbox">
+          <span></span>
+        </label>
+      </header>
+
+      <label>
+        CSS selector
+        <input id="selector" placeholder="#submit, .buy-button, button[data-id='go']">
+      </label>
+
+      <label>
+        按鈕文字
+        <input id="text" placeholder="送出 / 購買 / 開始">
+      </label>
+
+      <label>
+        aria-label / title / name
+        <input id="ariaLabel" placeholder="submit, buy, start">
+      </label>
+
+      <div class="grid">
+        <label class="check">
+          <input id="clickOnce" type="checkbox">
+          只點一次
+        </label>
+        <label class="check">
+          <input id="exactText" type="checkbox">
+          文字完全符合
+        </label>
+        <label class="check">
+          <input id="visibleOnly" type="checkbox">
+          只點可見元素
+        </label>
+      </div>
+
+      <label>
+        延遲毫秒
+        <input id="delayMs" type="number" min="0" step="10" placeholder="0">
+      </label>
+
+      <label>
+        指定開始時間
+        <input id="startAt" type="datetime-local" step="1">
+      </label>
+
+      <p id="countdown" class="countdown" aria-live="polite">未設定倒數</p>
+
+      <details>
+        <summary>進階多步驟流程</summary>
+        <label class="check">
+          <input id="workflowEnabled" type="checkbox">
+          使用步驟清單
+        </label>
+        <label>
+          步驟 JSON
+          <textarea id="workflowSteps" spellcheck="false" rows="10" placeholder='[{"type":"click","selector":"#firstButton"}]'></textarea>
+        </label>
+        <div class="actions">
+          <button id="sampleWorkflow" type="button">載入範例</button>
+          <button id="resetWorkflow" type="button">重設進度</button>
+        </div>
+      </details>
+
+      <div class="actions">
+        <button id="save" type="button">儲存設定</button>
+        <button id="test" type="button">立刻測試</button>
+        <button id="clearTime" type="button">清除時間</button>
+      </div>
+
+      <p id="status" aria-live="polite"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auto Click Test - Home</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel">
+        <p class="step">Step 1</p>
+        <h1>自動點擊流程測試</h1>
+        <p class="note">按下第一個按鈕後，頁面會動態產生三個同名目標按鈕。</p>
+        <button id="firstButton" class="primary" type="button">第一個按鈕</button>
+        <div id="quickButtons" class="button-row" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script>
+      const target = document.querySelector("#quickButtons");
+      document.querySelector("#firstButton").addEventListener("click", () => {
+        target.innerHTML = "";
+
+        for (let index = 1; index <= 3; index += 1) {
+          const link = document.createElement("a");
+          link.className = "quick-button";
+          link.href = "page2.html";
+          link.textContent = "趕快點我";
+          link.dataset.option = String(index);
+          target.append(link);
+        }
+      });
+    </script>
+  </body>
+</html>
