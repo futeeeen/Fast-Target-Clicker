@@ -17,7 +17,8 @@ const DEFAULT_CONFIG = {
   delayMs: 0,
   startAtMs: 0,
   workflowEnabled: false,
-  workflowSteps: ""
+  workflowSteps: "",
+  workflowStartStep: 1
 };
 
 let config = { ...DEFAULT_CONFIG };
@@ -147,6 +148,9 @@ async function scanAndClick(options = {}) {
   }
 
   if (config.workflowEnabled && config.workflowSteps.trim()) {
+    if (!options.force) {
+      return { ok: true, clicked: false, reason: "waiting-explicit-trigger" };
+    }
     return runWorkflow(options);
   }
 
@@ -177,11 +181,16 @@ async function scanAndClick(options = {}) {
 
 async function runNow(options = {}) {
   hasClicked = false;
-  setWorkflowIndex(0);
+  setWorkflowIndex(getStartIndex(options.startStep));
   return scanAndClick({
     force: true,
     ignoreEnabled: Boolean(options.ignoreEnabled)
   });
+}
+
+function getStartIndex(startStep) {
+  const rawStep = Number(startStep || config.workflowStartStep || 1);
+  return Math.max(0, Math.floor(rawStep) - 1);
 }
 
 function parseWorkflowSteps() {
@@ -454,7 +463,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message?.type === "fast-clicker-run-now") {
-    runNow({ ignoreEnabled: Boolean(message.ignoreEnabled) }).then(sendResponse);
+    runNow({
+      ignoreEnabled: Boolean(message.ignoreEnabled),
+      startStep: message.startStep
+    }).then(sendResponse);
     return true;
   }
 
@@ -465,9 +477,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === "fast-clicker-reset") {
     hasClicked = false;
-    setWorkflowIndex(0);
-    scanAndClick().then((result) => sendResponse({ ok: true, reset: true, result }));
-    return true;
+    setWorkflowIndex(getStartIndex(message.startStep));
+    setWorkflowStatus({
+      state: "reset",
+      index: getWorkflowIndex(),
+      reason: "workflow-reset"
+    });
+    sendResponse({ ok: true, reset: true, index: getWorkflowIndex() });
   }
 });
 

@@ -68,6 +68,10 @@
           步驟 JSON
           <textarea id="workflowSteps" spellcheck="false" rows="10" placeholder='[{"type":"click","selector":"#firstButton"}]'></textarea>
         </label>
+        <label>
+          從第幾步開始
+          <input id="workflowStartStep" type="number" min="1" step="1" placeholder="1">
+        </label>
         <div class="actions">
           <button id="sampleWorkflow" type="button">載入範例</button>
           <button id="resetWorkflow" type="button">重設進度</button>

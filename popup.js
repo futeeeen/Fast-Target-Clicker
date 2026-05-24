@@ -9,7 +9,8 @@ const DEFAULT_CONFIG = {
   delayMs: 0,
   startAtMs: 0,
   workflowEnabled: false,
-  workflowSteps: ""
+  workflowSteps: "",
+  workflowStartStep: 1
 };
 
 const fields = {
@@ -23,7 +24,8 @@ const fields = {
   delayMs: document.querySelector("#delayMs"),
   startAt: document.querySelector("#startAt"),
   workflowEnabled: document.querySelector("#workflowEnabled"),
-  workflowSteps: document.querySelector("#workflowSteps")
+  workflowSteps: document.querySelector("#workflowSteps"),
+  workflowStartStep: document.querySelector("#workflowStartStep")
 };
 
 const status = document.querySelector("#status");
@@ -54,7 +56,8 @@ function readForm() {
     delayMs: Math.max(0, Number(fields.delayMs.value || 0)),
     startAtMs: Number.isFinite(startAtMs) ? startAtMs : 0,
     workflowEnabled: fields.workflowEnabled.checked,
-    workflowSteps: fields.workflowSteps.value.trim()
+    workflowSteps: fields.workflowSteps.value.trim(),
+    workflowStartStep: Math.max(1, Math.floor(Number(fields.workflowStartStep.value || 1)))
   };
 }
 
@@ -78,6 +81,7 @@ function writeForm(config) {
   fields.startAt.value = toDateTimeLocalValue(config.startAtMs);
   fields.workflowEnabled.checked = config.workflowEnabled;
   fields.workflowSteps.value = config.workflowSteps;
+  fields.workflowStartStep.value = config.workflowStartStep || 1;
   updateCountdown(config);
 }
 
@@ -118,7 +122,8 @@ async function save(options = {}) {
   if (options.runNow && tabStatus.ok) {
     const result = await sendToActiveTab({
       type: "fast-clicker-run-now",
-      ignoreEnabled: Boolean(options.ignoreEnabled)
+      ignoreEnabled: Boolean(options.ignoreEnabled),
+      startStep: config.workflowStartStep
     }).catch(() => null);
     updateCountdown(config);
     setResultStatus(result);
@@ -238,6 +243,8 @@ function renderWorkflowStatus(data) {
     workflowStatus.textContent = "流程已完成";
   } else if (data.state === "waiting") {
     workflowStatus.textContent = "等待指定時間";
+  } else if (data.state === "reset") {
+    workflowStatus.textContent = Number.isInteger(data.index) ? `已重設到第 ${data.index + 1} 步` : "已重設流程";
   } else {
     workflowStatus.textContent = `${step}: ${data.reason || data.state || "unknown"}`;
   }
@@ -266,6 +273,7 @@ document.querySelector("#sampleWorkflow").addEventListener("click", async () => 
     { type: "check", selector: "#agreeTerms" },
     { type: "click", selector: "#finishButton" }
   ], null, 2);
+  fields.workflowStartStep.value = "1";
   setStatus("已載入範例，尚未儲存");
 });
 
@@ -277,8 +285,12 @@ document.querySelector("#resetWorkflow").addEventListener("click", async () => {
 });
 
 async function resetActiveTabWorkflow() {
+  const config = readForm();
   await ensureActiveTabReady();
-  await sendToActiveTab({ type: "fast-clicker-reset" }).catch(() => null);
+  await sendToActiveTab({
+    type: "fast-clicker-reset",
+    startStep: config.workflowStartStep
+  }).catch(() => null);
 }
 
 fields.enabled.addEventListener("change", save);

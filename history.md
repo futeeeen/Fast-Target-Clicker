@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_23:00:58
+* 新增「從第幾步開始」設定，可從指定步驟往下執行，方便單獨測後半段流程。
+* 修正「重設進度」會觸發執行的問題，現在只重設流程進度，不會掃描或點擊。
+* 進階流程在非明確觸發時不會自動執行，避免儲存設定或 DOM 變動誤觸流程。
+* Validation: ran `node --check content.js`, `node --check popup.js`, and `node --check background.js`.
+
 ## 2026.05.24_22:51:55
 * 新增進階流程狀態顯示，可在 popup 看到正在執行第幾步、最後完成第幾步、卡住原因與目前目標。
 * content script 每一步執行前後會回報 workflow status，background service worker 會暫存最新狀態供 popup 顯示。
