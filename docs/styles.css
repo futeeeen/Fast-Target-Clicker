@@ -276,6 +276,31 @@ pre code {
   color: #0f513c;
 }
 
+.practice-section {
+  background: #ffffff;
+}
+
+.practice-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f7fbff, #ffffff);
+}
+
+.practice-card p {
+  max-width: 760px;
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.practice-card .button {
+  flex: 0 0 auto;
+}
+
 .section {
   padding: clamp(64px, 8vw, 110px) clamp(18px, 5vw, 72px);
 }
@@ -650,11 +675,13 @@ pre code {
   }
 
   .code-toolbar,
+  .practice-card,
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
   }
 
+  .practice-card .button,
   .code-toolbar button {
     width: 100%;
   }

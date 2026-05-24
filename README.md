@@ -30,6 +30,16 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 
 頁面包含工具功能、使用流程、欄位說明與多種 JSON 設定範例。
 
+## 練習測試站
+
+產品介紹頁可以直接連到練習測試站：
+
+```text
+https://futeeeen.github.io/Fast-Target-Clicker/practice/
+```
+
+練習站包含多頁流程、動態按鈕、文字狀態判斷、表格 selector、數字開頭 id、延遲載入與表單 select/check 等情境。每個情境都附有可複製的 JSON 範例。
+
 ## 比賽當天設定
 
 優先使用 CSS selector，因為最快也最準：

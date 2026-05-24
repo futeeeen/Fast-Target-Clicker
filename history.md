@@ -1,5 +1,12 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_01:19:39
+* 新增公開練習測試站 `docs/practice`，提供多頁流程、文字條件、表格 selector、數字開頭 id、延遲載入與表單操作情境。
+* 產品介紹頁新增練習站入口與情境說明，讓使用者能直接從首頁進入測試站實作。
+* 根目錄 `test-site` 同步更新為新版練習站，移除舊的分頁式測試檔案。
+* README 補充 GitHub Pages 練習站網址與可練習的功能範圍。
+* Validation: ran `node --check` for practice scripts and docs script, parsed `extension/manifest.json`, and reviewed local practice pages.
+
 ## 2026.05.25_01:10:48
 * 將可安裝的擴充功能本體整理到 `extension` 資料夾，根目錄保留文件、產品介紹頁與測試資源。
 * 新增 `extension/README.md`，讓使用者拿到產品資料夾後可直接依說明用「載入未封裝項目」安裝。
