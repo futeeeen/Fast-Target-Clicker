@@ -120,6 +120,8 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 
 按「立刻測試」時會先儲存目前設定、把流程進度重設到第 1 步，然後立刻執行。指定開始時間到時也會使用同一套立即執行流程，所以每次到點都會從第 1 步開始跑。如果沒有找到目標，彈窗會顯示卡住原因，例如 `step-target-not-found`。
 
+流程進度會存在目前頁面的 `sessionStorage`，不再依賴擴充功能自己的 storage。這可以避免更新擴充功能後，舊頁面出現 `Extension context invalidated` 造成流程中斷。
+
 ## 時間到了沒有執行時
 
 先照這個順序檢查：

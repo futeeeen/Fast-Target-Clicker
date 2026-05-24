@@ -217,14 +217,19 @@ document.querySelector("#sampleWorkflow").addEventListener("click", async () => 
     { type: "check", selector: "#agreeTerms" },
     { type: "click", selector: "#finishButton" }
   ], null, 2);
-  await chrome.storage.local.set({ workflowIndex: 0 });
+  await resetActiveTabWorkflow();
   setStatus("已載入範例並重設進度");
 });
 
 document.querySelector("#resetWorkflow").addEventListener("click", async () => {
-  await chrome.storage.local.set({ workflowIndex: 0 });
+  await resetActiveTabWorkflow();
   setStatus("已重設流程進度");
 });
+
+async function resetActiveTabWorkflow() {
+  await ensureActiveTabReady();
+  await sendToActiveTab({ type: "fast-clicker-reset" }).catch(() => null);
+}
 
 fields.enabled.addEventListener("change", save);
 fields.startAt.addEventListener("change", () => updateCountdown());

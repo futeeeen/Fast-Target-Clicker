@@ -25,6 +25,9 @@ let hasClicked = false;
 let observer = null;
 let pendingClickTimer = null;
 let activationTimer = null;
+let memoryWorkflowIndex = 0;
+
+const WORKFLOW_INDEX_KEY = "fastTargetClicker.workflowIndex";
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
@@ -191,7 +194,7 @@ async function scanAndClick(options = {}) {
 
 async function runNow(options = {}) {
   hasClicked = false;
-  await setWorkflowIndex(0);
+  setWorkflowIndex(0);
   return scanAndClick({
     force: true,
     ignoreEnabled: Boolean(options.ignoreEnabled)
@@ -207,13 +210,25 @@ function parseWorkflowSteps() {
   }
 }
 
-async function getWorkflowIndex() {
-  const result = await chrome.storage.local.get({ workflowIndex: 0 });
-  return Number(result.workflowIndex || 0);
+function getWorkflowIndex() {
+  try {
+    const stored = sessionStorage.getItem(WORKFLOW_INDEX_KEY);
+    memoryWorkflowIndex = Number(stored || 0);
+  } catch {
+    // Some pages restrict storage; keep an in-memory fallback for the current document.
+  }
+
+  return Number(memoryWorkflowIndex || 0);
 }
 
-async function setWorkflowIndex(index) {
-  await chrome.storage.local.set({ workflowIndex: index });
+function setWorkflowIndex(index) {
+  memoryWorkflowIndex = Number(index || 0);
+
+  try {
+    sessionStorage.setItem(WORKFLOW_INDEX_KEY, String(memoryWorkflowIndex));
+  } catch {
+    // In-memory fallback is enough until the current page navigates.
+  }
 }
 
 function stepOptions(step) {
@@ -285,7 +300,7 @@ async function runWorkflow(options = {}) {
     return { ok: false, clicked: false, reason: "workflow-empty" };
   }
 
-  const index = await getWorkflowIndex();
+  const index = getWorkflowIndex();
   const step = steps[index];
   if (!step) {
     return { ok: true, clicked: false, reason: "workflow-finished", index, total: steps.length };
@@ -311,7 +326,7 @@ async function runWorkflow(options = {}) {
     if (!selectOption(element, step)) {
       return { ok: true, clicked: false, reason: "select-option-not-found", index, total: steps.length, step };
     }
-    await setWorkflowIndex(index + 1);
+    setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
     return { ok: true, clicked: true, action: "select", index, nextIndex: index + 1, total: steps.length, step };
   }
@@ -320,7 +335,7 @@ async function runWorkflow(options = {}) {
     if (!setCheckbox(element, step.checked !== false)) {
       return { ok: true, clicked: false, reason: "step-target-not-checkbox", index, total: steps.length, step };
     }
-    await setWorkflowIndex(index + 1);
+    setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
     return { ok: true, clicked: true, action: "check", index, nextIndex: index + 1, total: steps.length, step };
   }
@@ -332,12 +347,12 @@ async function runWorkflow(options = {}) {
     setNativeValue(element, step.value || "");
     element.dispatchEvent(new Event("input", { bubbles: true }));
     element.dispatchEvent(new Event("change", { bubbles: true }));
-    await setWorkflowIndex(index + 1);
+    setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
     return { ok: true, clicked: true, action: "fill", index, nextIndex: index + 1, total: steps.length, step };
   }
 
-  await setWorkflowIndex(index + 1);
+  setWorkflowIndex(index + 1);
   clickTarget(element, { ignoreClickOnce: true });
   setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 100));
   return { ok: true, clicked: true, action: "click", index, nextIndex: index + 1, total: steps.length, step };
@@ -403,9 +418,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === "fast-clicker-reset") {
     hasClicked = false;
-    chrome.storage.local.set({ workflowIndex: 0 });
-    scanAndClick();
-    sendResponse({ ok: true });
+    setWorkflowIndex(0);
+    scanAndClick().then((result) => sendResponse({ ok: true, reset: true, result }));
+    return true;
   }
 });
 

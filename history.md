@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_17:51:25
+* 修正更新擴充功能後舊頁面可能出現 `Extension context invalidated` 的問題。
+* 將多步驟流程進度改存到頁面的 `sessionStorage`，並保留目前文件的記憶體 fallback。
+* 「載入範例」與「重設進度」改為通知目前分頁重設流程，避免 content script 依賴已失效的 extension storage。
+* Validation: ran `node --check content.js` and `node --check popup.js`.
+
 ## 2026.05.24_17:48:52
 * 優化多步驟流程觸發規則，新增共用的立即執行路徑，執行前一定重設到第 1 步。
 * 「立刻測試」現在會先儲存設定、重設流程進度，再忽略倒數與啟用開關直接執行。
