@@ -8,22 +8,14 @@ const DEFAULT_CONFIG = {
   visibleOnly: true,
   delayMs: 0,
   startAtMs: 0,
-  workflowEnabled: false,
+  workflowEnabled: true,
   workflowSteps: "",
   workflowStartStep: 1
 };
 
 const fields = {
   enabled: document.querySelector("#enabled"),
-  selector: document.querySelector("#selector"),
-  text: document.querySelector("#text"),
-  ariaLabel: document.querySelector("#ariaLabel"),
-  clickOnce: document.querySelector("#clickOnce"),
-  exactText: document.querySelector("#exactText"),
-  visibleOnly: document.querySelector("#visibleOnly"),
-  delayMs: document.querySelector("#delayMs"),
   startAt: document.querySelector("#startAt"),
-  workflowEnabled: document.querySelector("#workflowEnabled"),
   workflowSteps: document.querySelector("#workflowSteps"),
   workflowStartStep: document.querySelector("#workflowStartStep")
 };
@@ -47,15 +39,15 @@ function readForm() {
 
   return {
     enabled: fields.enabled.checked,
-    selector: fields.selector.value.trim(),
-    text: fields.text.value.trim(),
-    ariaLabel: fields.ariaLabel.value.trim(),
-    clickOnce: fields.clickOnce.checked,
-    exactText: fields.exactText.checked,
-    visibleOnly: fields.visibleOnly.checked,
-    delayMs: Math.max(0, Number(fields.delayMs.value || 0)),
+    selector: "",
+    text: "",
+    ariaLabel: "",
+    clickOnce: true,
+    exactText: false,
+    visibleOnly: true,
+    delayMs: 0,
     startAtMs: Number.isFinite(startAtMs) ? startAtMs : 0,
-    workflowEnabled: fields.workflowEnabled.checked,
+    workflowEnabled: true,
     workflowSteps: fields.workflowSteps.value.trim(),
     workflowStartStep: Math.max(1, Math.floor(Number(fields.workflowStartStep.value || 1)))
   };
@@ -71,15 +63,7 @@ function toDateTimeLocalValue(ms) {
 
 function writeForm(config) {
   fields.enabled.checked = config.enabled;
-  fields.selector.value = config.selector;
-  fields.text.value = config.text;
-  fields.ariaLabel.value = config.ariaLabel;
-  fields.clickOnce.checked = config.clickOnce;
-  fields.exactText.checked = config.exactText;
-  fields.visibleOnly.checked = config.visibleOnly;
-  fields.delayMs.value = config.delayMs;
   fields.startAt.value = toDateTimeLocalValue(config.startAtMs);
-  fields.workflowEnabled.checked = config.workflowEnabled;
   fields.workflowSteps.value = config.workflowSteps;
   fields.workflowStartStep.value = config.workflowStartStep || 1;
   updateCountdown(config);

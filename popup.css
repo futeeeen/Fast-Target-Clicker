@@ -149,19 +149,20 @@ button:nth-child(n + 2) {
   font-weight: 700;
 }
 
-details {
+.workflow-panel {
   border-top: 1px solid #d8e0eb;
   border-bottom: 1px solid #d8e0eb;
   padding: 10px 0;
 }
 
-summary {
-  cursor: pointer;
+.workflow-panel h2 {
+  margin: 0 0 10px;
+  font-size: 15px;
   font-weight: 700;
 }
 
-details > label,
-details > .actions {
+.workflow-panel > label,
+.workflow-panel > .actions {
   margin-top: 10px;
 }
 

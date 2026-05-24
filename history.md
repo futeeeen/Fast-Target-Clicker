@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_00:27:39
+* 簡化 popup 介面，移除較少使用的單步 selector/text/aria/checkbox/delay 欄位。
+* popup 現在聚焦在指定開始時間、多步驟 JSON、起始步驟、流程狀態與操作按鈕。
+* 多步驟流程在 UI 中固定啟用，底層單步設定仍保留安全預設以避免破壞既有程式邏輯。
+* Validation: ran `node --check popup.js`, `node --check content.js`, and `node --check background.js`.
+
 ## 2026.05.25_00:20:47
 * 新增每一步的 `waitForMs` 與 `pollMs`，目標尚未出現時會持續等待並輪詢。
 * 未設定等待參數時預設最多等待 `10000` ms、每 `500` ms 檢查一次。
