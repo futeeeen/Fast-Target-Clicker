@@ -138,24 +138,6 @@ function scheduleActivationScan() {
     clearTimeout(activationTimer);
     activationTimer = null;
   }
-
-  if (!config.enabled || !isBeforeStartTime()) return;
-
-  const startAtMs = Number(config.startAtMs);
-  const waitMs = Math.min(startAtMs - Date.now() - 100, 2147483647);
-
-  activationTimer = setTimeout(() => {
-    const waitForExactTime = () => {
-      if (Date.now() >= startAtMs) {
-        runNow({ ignoreEnabled: false });
-        return;
-      }
-
-      requestAnimationFrame(waitForExactTime);
-    };
-
-    waitForExactTime();
-  }, Math.max(0, waitMs));
 }
 
 async function scanAndClick(options = {}) {

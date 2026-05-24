@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_17:58:55
+* 釐清按鈕職責：「載入範例」只填入範例，「儲存設定」只保存與安排倒數，不再直接執行流程。
+* 新增 `background.js` 與 `chrome.alarms` 排程，指定時間到時由背景 service worker 通知目標分頁從第 1 步執行。
+* 移除 content script 自行等待指定時間的頁面 timer，避免與背景排程重複或失效。
+* Validation: ran `node --check content.js`, `node --check popup.js`, `node --check background.js`, and parsed `manifest.json`.
+
 ## 2026.05.24_17:51:25
 * 修正更新擴充功能後舊頁面可能出現 `Extension context invalidated` 的問題。
 * 將多步驟流程進度改存到頁面的 `sessionStorage`，並保留目前文件的記憶體 fallback。

@@ -110,6 +110,7 @@ async function save(options = {}) {
   const config = readForm();
   await chrome.storage.sync.set(config);
   const tabStatus = await ensureActiveTabReady();
+  await scheduleActiveTabStart(config, tabStatus);
 
   if (options.runNow && tabStatus.ok) {
     const result = await sendToActiveTab({
@@ -121,9 +122,6 @@ async function save(options = {}) {
     return { config, tabStatus, result };
   }
 
-  if (tabStatus.ok && config.enabled && (!config.startAtMs || config.startAtMs <= Date.now())) {
-    await sendToActiveTab({ type: "fast-clicker-run-now", ignoreEnabled: false }).catch(() => null);
-  }
   updateCountdown(config);
 
   if (!tabStatus.ok) {
@@ -179,6 +177,20 @@ async function ensureActiveTabReady() {
   }
 }
 
+async function scheduleActiveTabStart(config, tabStatus) {
+  if (!tabStatus.ok || !config.enabled || !config.startAtMs || config.startAtMs <= Date.now()) {
+    await chrome.runtime.sendMessage({ type: "fast-clicker-clear-start" }).catch(() => null);
+    return;
+  }
+
+  const tab = await getActiveTab();
+  await chrome.runtime.sendMessage({
+    type: "fast-clicker-schedule-start",
+    tabId: tab?.id || 0,
+    startAtMs: config.startAtMs
+  }).catch(() => null);
+}
+
 document.querySelector("#save").addEventListener("click", save);
 
 document.querySelector("#test").addEventListener("click", async () => {
@@ -217,8 +229,7 @@ document.querySelector("#sampleWorkflow").addEventListener("click", async () => 
     { type: "check", selector: "#agreeTerms" },
     { type: "click", selector: "#finishButton" }
   ], null, 2);
-  await resetActiveTabWorkflow();
-  setStatus("已載入範例並重設進度");
+  setStatus("已載入範例，尚未儲存");
 });
 
 document.querySelector("#resetWorkflow").addEventListener("click", async () => {

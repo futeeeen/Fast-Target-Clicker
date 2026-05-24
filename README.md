@@ -122,6 +122,13 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 
 流程進度會存在目前頁面的 `sessionStorage`，不再依賴擴充功能自己的 storage。這可以避免更新擴充功能後，舊頁面出現 `Extension context invalidated` 造成流程中斷。
 
+按鈕行為：
+
+- 「載入範例」只會把範例 JSON 填進欄位，不會執行。
+- 「儲存設定」只會保存設定並安排指定時間，不會執行。
+- 「立刻測試」才會從第 1 步立即執行。
+- 指定時間到時由背景 service worker 的 `chrome.alarms` 觸發，會對儲存時所在的分頁從第 1 步執行。
+
 ## 時間到了沒有執行時
 
 先照這個順序檢查：

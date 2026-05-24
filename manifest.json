@@ -5,6 +5,7 @@
   "description": "Configurable auto-click helper for quickly clicking a target button when it appears.",
   "permissions": [
     "activeTab",
+    "alarms",
     "storage",
     "scripting"
   ],
@@ -14,6 +15,9 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "Fast Target Clicker"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
