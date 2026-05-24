@@ -1,5 +1,10 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_23:35:18
+* 修正 `nextDelayMs` 在點擊後跳頁時可能失效的問題；現在會先保存下一步與恢復時間，讓新頁面載入後接續執行。
+* workflow resume 狀態改由 `sessionStorage` 記錄 active/resumeAt，避免舊頁面 timer 被導航清掉後流程中斷。
+* Validation: ran `node --check content.js`, `node --check popup.js`, and `node --check background.js`.
+
 ## 2026.05.24_23:00:58
 * 新增「從第幾步開始」設定，可從指定步驟往下執行，方便單獨測後半段流程。
 * 修正「重設進度」會觸發執行的問題，現在只重設流程進度，不會掃描或點擊。
