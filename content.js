@@ -38,6 +38,23 @@ function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeList(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map(normalize).filter(Boolean);
+}
+
+function getElementText(element) {
+  return normalize(element.innerText || element.textContent || element.value || "");
+}
+
+function hasTextFilter(options = config) {
+  return Boolean(
+    normalize(options.text) ||
+    normalizeList(options.textIncludes).length ||
+    normalizeList(options.textExcludes).length
+  );
+}
+
 function isVisible(element, options = config) {
   if (!options.visibleOnly) return true;
   if (!(element instanceof HTMLElement)) return true;
@@ -56,10 +73,17 @@ function isVisible(element, options = config) {
 
 function textMatches(element, options = config) {
   const wanted = normalize(options.text);
-  if (!wanted) return true;
+  const includes = normalizeList(options.textIncludes);
+  const excludes = normalizeList(options.textExcludes);
 
-  const actual = normalize(element.innerText || element.textContent || element.value || "");
-  return options.exactText ? actual === wanted : actual.includes(wanted);
+  if (!wanted && !includes.length && !excludes.length) return true;
+
+  const actual = getElementText(element);
+  const textOk = !wanted || (options.exactText ? actual === wanted : actual.includes(wanted));
+  const includesOk = includes.every((item) => actual.includes(item));
+  const excludesOk = excludes.every((item) => !actual.includes(item));
+
+  return textOk && includesOk && excludesOk;
 }
 
 function ariaMatches(element, options = config) {
@@ -88,10 +112,13 @@ function isActionCandidate(element, options = config) {
   if (!ariaMatches(element, options)) return false;
 
   const tagName = element.tagName.toLowerCase();
+  const hasTextFilterValue = hasTextFilter(options);
+
   return (
     tagName === "button" ||
     tagName === "a" ||
     tagName === "input" ||
+    (hasTextFilterValue && ["div", "li", "label", "span"].includes(tagName)) ||
     element.getAttribute("role") === "button" ||
     element.onclick ||
     element.tabIndex >= 0
@@ -107,13 +134,22 @@ function getCandidates(options = config) {
     }
   }
 
-  return Array.from(
-    document.querySelectorAll("button, a, input[type='button'], input[type='submit'], [role='button'], [onclick]")
-  );
+  const selector = hasTextFilter(options)
+    ? "button, a, li, div, label, span, input[type='button'], input[type='submit'], [role='button'], [onclick]"
+    : "button, a, input[type='button'], input[type='submit'], [role='button'], [onclick]";
+
+  return Array.from(document.querySelectorAll(selector));
 }
 
 function findTarget(options = config) {
-  return getCandidates(options).find((element) => isActionCandidate(element, options)) || null;
+  const matches = getCandidates(options).filter((element) => isActionCandidate(element, options));
+  if (!matches.length) return null;
+
+  if (hasTextFilter(options) && !options.selector?.trim()) {
+    matches.sort((a, b) => getElementText(a).length - getElementText(b).length);
+  }
+
+  return matches[0];
 }
 
 function clickTarget(target, options = {}) {
@@ -283,7 +319,11 @@ function queueNextWorkflowStep(nextIndex, delayMs) {
 }
 
 function describeStep(step = {}) {
-  return step.selector || step.text || step.ariaLabel || step.value || "";
+  if (step.selector) return step.selector;
+  if (step.textIncludes?.length) return `includes: ${step.textIncludes.join(", ")}`;
+  if (step.text) return step.text;
+  if (step.ariaLabel) return step.ariaLabel;
+  return step.value || "";
 }
 
 function setWorkflowStatus(status) {
@@ -309,6 +349,8 @@ function stepOptions(step) {
   return {
     selector: step.selector || "",
     text: step.text || "",
+    textIncludes: Array.isArray(step.textIncludes) ? step.textIncludes : [],
+    textExcludes: Array.isArray(step.textExcludes) ? step.textExcludes : [],
     ariaLabel: step.ariaLabel || "",
     exactText: Boolean(step.exactText),
     visibleOnly: step.visibleOnly !== false
@@ -319,7 +361,10 @@ function findElementForStep(step) {
   if (step.selector?.trim()) {
     try {
       return Array.from(document.querySelectorAll(step.selector.trim()))
-        .find((element) => isVisible(element, stepOptions(step))) || null;
+        .find((element) => {
+          const options = stepOptions(step);
+          return isVisible(element, options) && textMatches(element, options) && ariaMatches(element, options);
+        }) || null;
     } catch {
       return null;
     }

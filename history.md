@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_23:52:50
+* 新增 `textIncludes` 與 `textExcludes` 條件，支援同一步必須包含多個文字並排除指定狀態。
+* 有 selector 時會在 selector 結果中再做文字條件篩選；沒有 selector 時會掃描常見可點擊元素並優先選文字較貼近的目標。
+* 更新 README，加入依狀態文字選擇區域的設定範例。
+* Validation: ran `node --check content.js`, `node --check popup.js`, and `node --check background.js`.
+
 ## 2026.05.24_23:35:18
 * 修正 `nextDelayMs` 在點擊後跳頁時可能失效的問題；現在會先保存下一步與恢復時間，讓新頁面載入後接續執行。
 * workflow resume 狀態改由 `sessionStorage` 記錄 active/resumeAt，避免舊頁面 timer 被導航清掉後流程中斷。

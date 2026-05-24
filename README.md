@@ -135,6 +135,31 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 
 `nextDelayMs` 代表「本步驟執行後，延遲多少毫秒再做下一步」。如果本步驟會跳頁，工具會先記住下一步與恢復時間，新頁面載入後會接著執行，不再依賴舊頁面的 timer。
 
+如果比賽當天要依照文字狀態選項目，可以用 `textIncludes` 與 `textExcludes`。有 `selector` 時會先用 selector 縮小範圍，再比對文字；沒有 `selector` 時也會掃描常見可點擊元素並依文字找到目標。
+
+```json
+[
+  {
+    "type": "click",
+    "selector": "li",
+    "textIncludes": ["特C區", "5990"],
+    "textExcludes": ["已售完"]
+  }
+]
+```
+
+也可以不指定 selector：
+
+```json
+[
+  {
+    "type": "click",
+    "textIncludes": ["特C區", "5990"],
+    "textExcludes": ["已售完"]
+  }
+]
+```
+
 ## 時間到了沒有執行時
 
 先照這個順序檢查：
