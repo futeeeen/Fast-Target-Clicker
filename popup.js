@@ -234,7 +234,9 @@ function renderWorkflowStatus(data) {
   const action = data.action ? ` ${data.action}` : "";
 
   if (data.state === "running") {
-    workflowStatus.textContent = `正在執行 ${step}${action}`;
+    workflowStatus.textContent = data.reason === "waiting-for-target"
+      ? `正在等待 ${step}${action}`
+      : `正在執行 ${step}${action}`;
   } else if (data.state === "blocked") {
     workflowStatus.textContent = `卡在 ${step}: ${data.reason || "unknown"}`;
   } else if (data.state === "done") {

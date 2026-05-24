@@ -135,6 +135,20 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 
 `nextDelayMs` 代表「本步驟執行後，延遲多少毫秒再做下一步」。如果本步驟會跳頁，工具會先記住下一步與恢復時間，新頁面載入後會接著執行，不再依賴舊頁面的 timer。
 
+每一步也會等待目標出現。可以用 `waitForMs` 設定最多等待時間，用 `pollMs` 設定檢查頻率。沒有設定時，預設最多等 `10000` ms，每 `500` ms 檢查一次。等待期間流程狀態會顯示「正在等待」，超時仍找不到會顯示 `step-target-not-found`。
+
+```json
+[
+  {
+    "type": "click",
+    "selector": "#gameList button",
+    "waitForMs": 15000,
+    "pollMs": 200,
+    "nextDelayMs": 500
+  }
+]
+```
+
 如果比賽當天要依照文字狀態選項目，可以用 `textIncludes` 與 `textExcludes`。有 `selector` 時會先用 selector 縮小範圍，再比對文字；沒有 `selector` 時也會掃描常見可點擊元素並依文字找到目標。
 
 ```json

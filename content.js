@@ -33,6 +33,8 @@ const WORKFLOW_INDEX_KEY = "fastTargetClicker.workflowIndex";
 const WORKFLOW_STATUS_KEY = "fastTargetClicker.workflowStatus";
 const WORKFLOW_ACTIVE_KEY = "fastTargetClicker.workflowActive";
 const WORKFLOW_RESUME_AT_KEY = "fastTargetClicker.workflowResumeAt";
+const DEFAULT_WAIT_FOR_MS = 10000;
+const DEFAULT_POLL_MS = 500;
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
@@ -360,6 +362,16 @@ function queueNextWorkflowStep(nextIndex, delayMs) {
   scheduleWorkflowResume();
 }
 
+function getStepWaitForMs(step = {}) {
+  const value = Number(step.waitForMs);
+  return Number.isFinite(value) && value >= 0 ? value : DEFAULT_WAIT_FOR_MS;
+}
+
+function getStepPollMs(step = {}) {
+  const value = Number(step.pollMs);
+  return Number.isFinite(value) && value > 0 ? value : DEFAULT_POLL_MS;
+}
+
 function describeStep(step = {}) {
   if (step.selector) return step.selector;
   const groups = getTextIncludeGroups(step);
@@ -409,7 +421,7 @@ function stepOptions(step) {
   return options;
 }
 
-function findElementForStep(step) {
+function findElementForStepNow(step) {
   if (step.selector?.trim()) {
     try {
       return Array.from(document.querySelectorAll(step.selector.trim()))
@@ -423,6 +435,32 @@ function findElementForStep(step) {
   }
 
   return findTarget(stepOptions(step));
+}
+
+async function findElementForStep(step, context) {
+  const waitForMs = getStepWaitForMs(step);
+  const pollMs = getStepPollMs(step);
+  const startedAt = Date.now();
+  const deadline = startedAt + waitForMs;
+
+  while (true) {
+    const element = findElementForStepNow(step);
+    if (element) return element;
+
+    const now = Date.now();
+    if (now >= deadline) return null;
+
+    setWorkflowStatus({
+      state: "running",
+      reason: "waiting-for-target",
+      waitedMs: now - startedAt,
+      waitForMs,
+      pollMs,
+      ...context
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, Math.min(pollMs, deadline - now)));
+  }
 }
 
 function setNativeValue(element, value) {
@@ -495,7 +533,15 @@ async function runWorkflow(options = {}) {
     step
   });
 
-  const element = findElementForStep(step);
+  const context = {
+    index,
+    total: steps.length,
+    action: type,
+    target: describeStep(step),
+    step
+  };
+
+  const element = await findElementForStep(step, context);
   if (!element) {
     const result = {
       ok: true,
@@ -503,6 +549,7 @@ async function runWorkflow(options = {}) {
       reason: "step-target-not-found",
       index,
       total: steps.length,
+      waitedMs: getStepWaitForMs(step),
       step
     };
     setWorkflowActive(false);
@@ -513,6 +560,7 @@ async function runWorkflow(options = {}) {
       action: type,
       target: describeStep(step),
       reason: result.reason,
+      waitedMs: getStepWaitForMs(step),
       step
     });
     return result;

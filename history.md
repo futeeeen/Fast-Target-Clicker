@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_00:20:47
+* 新增每一步的 `waitForMs` 與 `pollMs`，目標尚未出現時會持續等待並輪詢。
+* 未設定等待參數時預設最多等待 `10000` ms、每 `500` ms 檢查一次。
+* 等待期間 popup 顯示「正在等待」，超時仍找不到目標時顯示 `step-target-not-found`，原本 `nextDelayMs` 仍保留為成功後延遲下一步。
+* Validation: ran `node --check content.js`, `node --check popup.js`, and `node --check background.js`.
+
 ## 2026.05.25_00:10:47
 * 新增 `textIncludes_1`, `textIncludes_2` 等多組文字條件，同組內維持 AND，不同組之間改為 OR。
 * 保留原本 `textIncludes` 用法，並可與編號群組一起使用。
