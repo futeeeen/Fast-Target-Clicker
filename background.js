@@ -40,6 +40,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "fast-clicker-workflow-status") {
+    chrome.storage.local.set({
+      workflowStatus: {
+        tabId: sender.tab?.id || 0,
+        ...message.status
+      }
+    }).then(() => sendResponse({ ok: true }));
+    return true;
+  }
+
   return false;
 });
 

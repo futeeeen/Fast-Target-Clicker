@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.24_22:51:55
+* 新增進階流程狀態顯示，可在 popup 看到正在執行第幾步、最後完成第幾步、卡住原因與目前目標。
+* content script 每一步執行前後會回報 workflow status，background service worker 會暫存最新狀態供 popup 顯示。
+* 「重設進度」會同步清除狀態顯示，方便重新測試。
+* Validation: ran `node --check content.js`, `node --check popup.js`, and `node --check background.js`.
+
 ## 2026.05.24_17:58:55
 * 釐清按鈕職責：「載入範例」只填入範例，「儲存設定」只保存與安排倒數，不再直接執行流程。
 * 新增 `background.js` 與 `chrome.alarms` 排程，指定時間到時由背景 service worker 通知目標分頁從第 1 步執行。

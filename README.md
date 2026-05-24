@@ -129,6 +129,8 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 - 「立刻測試」才會從第 1 步立即執行。
 - 指定時間到時由背景 service worker 的 `chrome.alarms` 觸發，會對儲存時所在的分頁從第 1 步執行。
 
+進階流程下方會顯示「流程狀態」，包含正在執行第幾步、最後完成第幾步、卡住原因，以及目前步驟使用的 selector/text/value。
+
 ## 時間到了沒有執行時
 
 先照這個順序檢查：

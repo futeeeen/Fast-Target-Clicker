@@ -28,7 +28,10 @@ const fields = {
 
 const status = document.querySelector("#status");
 const countdown = document.querySelector("#countdown");
+const workflowStatus = document.querySelector("#workflowStatus");
+const workflowTarget = document.querySelector("#workflowTarget");
 let countdownTimer = null;
+let workflowStatusTimer = null;
 
 function setStatus(message) {
   status.textContent = message;
@@ -213,6 +216,40 @@ function setResultStatus(result) {
   }
 }
 
+function renderWorkflowStatus(data) {
+  if (!data) {
+    workflowStatus.textContent = "尚未執行";
+    workflowTarget.textContent = "";
+    return;
+  }
+
+  const step = Number.isInteger(data.index) && Number.isInteger(data.total)
+    ? `第 ${data.index + 1} / ${data.total} 步`
+    : "流程";
+  const action = data.action ? ` ${data.action}` : "";
+
+  if (data.state === "running") {
+    workflowStatus.textContent = `正在執行 ${step}${action}`;
+  } else if (data.state === "blocked") {
+    workflowStatus.textContent = `卡在 ${step}: ${data.reason || "unknown"}`;
+  } else if (data.state === "done") {
+    workflowStatus.textContent = `完成 ${step}${action}`;
+  } else if (data.state === "finished") {
+    workflowStatus.textContent = "流程已完成";
+  } else if (data.state === "waiting") {
+    workflowStatus.textContent = "等待指定時間";
+  } else {
+    workflowStatus.textContent = `${step}: ${data.reason || data.state || "unknown"}`;
+  }
+
+  workflowTarget.textContent = data.target ? `目標：${data.target}` : "";
+}
+
+async function refreshWorkflowStatus() {
+  const result = await chrome.storage.local.get({ workflowStatus: null }).catch(() => ({ workflowStatus: null }));
+  renderWorkflowStatus(result.workflowStatus);
+}
+
 document.querySelector("#clearTime").addEventListener("click", async () => {
   fields.startAt.value = "";
   await save();
@@ -234,6 +271,8 @@ document.querySelector("#sampleWorkflow").addEventListener("click", async () => 
 
 document.querySelector("#resetWorkflow").addEventListener("click", async () => {
   await resetActiveTabWorkflow();
+  await chrome.storage.local.set({ workflowStatus: null }).catch(() => null);
+  renderWorkflowStatus(null);
   setStatus("已重設流程進度");
 });
 
@@ -247,4 +286,6 @@ fields.startAt.addEventListener("change", () => updateCountdown());
 
 chrome.storage.sync.get(DEFAULT_CONFIG).then((config) => {
   writeForm(config);
+  refreshWorkflowStatus();
+  workflowStatusTimer = setInterval(refreshWorkflowStatus, 500);
 });

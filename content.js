@@ -28,6 +28,7 @@ let activationTimer = null;
 let memoryWorkflowIndex = 0;
 
 const WORKFLOW_INDEX_KEY = "fastTargetClicker.workflowIndex";
+const WORKFLOW_STATUS_KEY = "fastTargetClicker.workflowStatus";
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
@@ -213,6 +214,29 @@ function setWorkflowIndex(index) {
   }
 }
 
+function describeStep(step = {}) {
+  return step.selector || step.text || step.ariaLabel || step.value || "";
+}
+
+function setWorkflowStatus(status) {
+  const nextStatus = {
+    updatedAt: Date.now(),
+    url: location.href,
+    ...status
+  };
+
+  try {
+    sessionStorage.setItem(WORKFLOW_STATUS_KEY, JSON.stringify(nextStatus));
+  } catch {
+    // Status is diagnostic only; execution should continue even if storage is blocked.
+  }
+
+  chrome.runtime.sendMessage({
+    type: "fast-clicker-workflow-status",
+    status: nextStatus
+  }).catch(() => {});
+}
+
 function stepOptions(step) {
   return {
     selector: step.selector || "",
@@ -274,24 +298,39 @@ function setCheckbox(element, checked) {
 async function runWorkflow(options = {}) {
   if (!options.force && isBeforeStartTime()) {
     scheduleActivationScan();
-    return { ok: true, clicked: false, reason: "waiting-start-time" };
+    const result = { ok: true, clicked: false, reason: "waiting-start-time" };
+    setWorkflowStatus({ state: "waiting", reason: result.reason });
+    return result;
   }
 
   const steps = parseWorkflowSteps();
   if (!steps.length) {
-    return { ok: false, clicked: false, reason: "workflow-empty" };
+    const result = { ok: false, clicked: false, reason: "workflow-empty" };
+    setWorkflowStatus({ state: "error", reason: result.reason });
+    return result;
   }
 
   const index = getWorkflowIndex();
   const step = steps[index];
   if (!step) {
-    return { ok: true, clicked: false, reason: "workflow-finished", index, total: steps.length };
+    const result = { ok: true, clicked: false, reason: "workflow-finished", index, total: steps.length };
+    setWorkflowStatus({ state: "finished", index, total: steps.length, reason: result.reason });
+    return result;
   }
 
   const type = step.type || "click";
+  setWorkflowStatus({
+    state: "running",
+    index,
+    total: steps.length,
+    action: type,
+    target: describeStep(step),
+    step
+  });
+
   const element = findElementForStep(step);
   if (!element) {
-    return {
+    const result = {
       ok: true,
       clicked: false,
       reason: "step-target-not-found",
@@ -299,45 +338,71 @@ async function runWorkflow(options = {}) {
       total: steps.length,
       step
     };
+    setWorkflowStatus({
+      state: "blocked",
+      index,
+      total: steps.length,
+      action: type,
+      target: describeStep(step),
+      reason: result.reason,
+      step
+    });
+    return result;
   }
 
   if (type === "select") {
     if (!(element instanceof HTMLSelectElement)) {
-      return { ok: true, clicked: false, reason: "step-target-not-select", index, total: steps.length, step };
+      const result = { ok: true, clicked: false, reason: "step-target-not-select", index, total: steps.length, step };
+      setWorkflowStatus({ state: "blocked", index, total: steps.length, action: type, target: describeStep(step), reason: result.reason, step });
+      return result;
     }
     if (!selectOption(element, step)) {
-      return { ok: true, clicked: false, reason: "select-option-not-found", index, total: steps.length, step };
+      const result = { ok: true, clicked: false, reason: "select-option-not-found", index, total: steps.length, step };
+      setWorkflowStatus({ state: "blocked", index, total: steps.length, action: type, target: describeStep(step), reason: result.reason, step });
+      return result;
     }
     setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
-    return { ok: true, clicked: true, action: "select", index, nextIndex: index + 1, total: steps.length, step };
+    const result = { ok: true, clicked: true, action: "select", index, nextIndex: index + 1, total: steps.length, step };
+    setWorkflowStatus({ state: "done", index, nextIndex: index + 1, total: steps.length, action: type, target: describeStep(step), step });
+    return result;
   }
 
   if (type === "check") {
     if (!setCheckbox(element, step.checked !== false)) {
-      return { ok: true, clicked: false, reason: "step-target-not-checkbox", index, total: steps.length, step };
+      const result = { ok: true, clicked: false, reason: "step-target-not-checkbox", index, total: steps.length, step };
+      setWorkflowStatus({ state: "blocked", index, total: steps.length, action: type, target: describeStep(step), reason: result.reason, step });
+      return result;
     }
     setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
-    return { ok: true, clicked: true, action: "check", index, nextIndex: index + 1, total: steps.length, step };
+    const result = { ok: true, clicked: true, action: "check", index, nextIndex: index + 1, total: steps.length, step };
+    setWorkflowStatus({ state: "done", index, nextIndex: index + 1, total: steps.length, action: type, target: describeStep(step), step });
+    return result;
   }
 
   if (type === "fill") {
     if (!("value" in element)) {
-      return { ok: true, clicked: false, reason: "step-target-not-fillable", index, total: steps.length, step };
+      const result = { ok: true, clicked: false, reason: "step-target-not-fillable", index, total: steps.length, step };
+      setWorkflowStatus({ state: "blocked", index, total: steps.length, action: type, target: describeStep(step), reason: result.reason, step });
+      return result;
     }
     setNativeValue(element, step.value || "");
     element.dispatchEvent(new Event("input", { bubbles: true }));
     element.dispatchEvent(new Event("change", { bubbles: true }));
     setWorkflowIndex(index + 1);
     setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 50));
-    return { ok: true, clicked: true, action: "fill", index, nextIndex: index + 1, total: steps.length, step };
+    const result = { ok: true, clicked: true, action: "fill", index, nextIndex: index + 1, total: steps.length, step };
+    setWorkflowStatus({ state: "done", index, nextIndex: index + 1, total: steps.length, action: type, target: describeStep(step), step });
+    return result;
   }
 
   setWorkflowIndex(index + 1);
   clickTarget(element, { ignoreClickOnce: true });
   setTimeout(() => runWorkflow({ force: true }), Number(step.nextDelayMs || 100));
-  return { ok: true, clicked: true, action: "click", index, nextIndex: index + 1, total: steps.length, step };
+  const result = { ok: true, clicked: true, action: "click", index, nextIndex: index + 1, total: steps.length, step };
+  setWorkflowStatus({ state: "done", index, nextIndex: index + 1, total: steps.length, action: type, target: describeStep(step), step });
+  return result;
 }
 
 function startObserver() {
