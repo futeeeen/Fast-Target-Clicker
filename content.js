@@ -51,8 +51,27 @@ function hasTextFilter(options = config) {
   return Boolean(
     normalize(options.text) ||
     normalizeList(options.textIncludes).length ||
+    getTextIncludeGroups(options).length ||
     normalizeList(options.textExcludes).length
   );
+}
+
+function getTextIncludeGroups(options = config) {
+  const groups = [];
+
+  if (normalizeList(options.textIncludes).length) {
+    groups.push(normalizeList(options.textIncludes));
+  }
+
+  Object.keys(options)
+    .filter((key) => /^textIncludes_\d+$/.test(key))
+    .sort((a, b) => Number(a.split("_")[1]) - Number(b.split("_")[1]))
+    .forEach((key) => {
+      const group = normalizeList(options[key]);
+      if (group.length) groups.push(group);
+    });
+
+  return groups;
 }
 
 function isVisible(element, options = config) {
@@ -73,14 +92,14 @@ function isVisible(element, options = config) {
 
 function textMatches(element, options = config) {
   const wanted = normalize(options.text);
-  const includes = normalizeList(options.textIncludes);
+  const includeGroups = getTextIncludeGroups(options);
   const excludes = normalizeList(options.textExcludes);
 
-  if (!wanted && !includes.length && !excludes.length) return true;
+  if (!wanted && !includeGroups.length && !excludes.length) return true;
 
   const actual = getElementText(element);
   const textOk = !wanted || (options.exactText ? actual === wanted : actual.includes(wanted));
-  const includesOk = includes.every((item) => actual.includes(item));
+  const includesOk = !includeGroups.length || includeGroups.some((group) => group.every((item) => actual.includes(item)));
   const excludesOk = excludes.every((item) => !actual.includes(item));
 
   return textOk && includesOk && excludesOk;
@@ -125,6 +144,24 @@ function isActionCandidate(element, options = config) {
   );
 }
 
+function getCandidatePriority(element) {
+  const tagName = element.tagName.toLowerCase();
+
+  if (
+    tagName === "button" ||
+    tagName === "a" ||
+    tagName === "input" ||
+    element.getAttribute("role") === "button" ||
+    element.onclick ||
+    element.tabIndex >= 0
+  ) {
+    return 0;
+  }
+
+  if (tagName === "li" || tagName === "label") return 1;
+  return 2;
+}
+
 function getCandidates(options = config) {
   if (options.selector?.trim()) {
     try {
@@ -146,7 +183,12 @@ function findTarget(options = config) {
   if (!matches.length) return null;
 
   if (hasTextFilter(options) && !options.selector?.trim()) {
-    matches.sort((a, b) => getElementText(a).length - getElementText(b).length);
+    matches.sort((a, b) => {
+      const priorityDiff = getCandidatePriority(a) - getCandidatePriority(b);
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return getElementText(a).length - getElementText(b).length;
+    });
   }
 
   return matches[0];
@@ -320,6 +362,8 @@ function queueNextWorkflowStep(nextIndex, delayMs) {
 
 function describeStep(step = {}) {
   if (step.selector) return step.selector;
+  const groups = getTextIncludeGroups(step);
+  if (groups.length > 1) return `include groups: ${groups.map((group) => `[${group.join(", ")}]`).join(" OR ")}`;
   if (step.textIncludes?.length) return `includes: ${step.textIncludes.join(", ")}`;
   if (step.text) return step.text;
   if (step.ariaLabel) return step.ariaLabel;
@@ -346,7 +390,7 @@ function setWorkflowStatus(status) {
 }
 
 function stepOptions(step) {
-  return {
+  const options = {
     selector: step.selector || "",
     text: step.text || "",
     textIncludes: Array.isArray(step.textIncludes) ? step.textIncludes : [],
@@ -355,6 +399,14 @@ function stepOptions(step) {
     exactText: Boolean(step.exactText),
     visibleOnly: step.visibleOnly !== false
   };
+
+  Object.keys(step)
+    .filter((key) => /^textIncludes_\d+$/.test(key))
+    .forEach((key) => {
+      options[key] = Array.isArray(step[key]) ? step[key] : [];
+    });
+
+  return options;
 }
 
 function findElementForStep(step) {

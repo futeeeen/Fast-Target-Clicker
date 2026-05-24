@@ -160,6 +160,21 @@ https://futeeeen.github.io/Fast-Target-Clicker/
 ]
 ```
 
+如果要設定多組 OR 條件，可以使用 `textIncludes_1`, `textIncludes_2`。每一組陣列內仍然是 AND，不同組之間是 OR。
+
+```json
+[
+  {
+    "type": "click",
+    "textIncludes_1": ["特C區", "5990", "剩餘"],
+    "textIncludes_2": ["特C區", "5990", "熱賣中"],
+    "textExcludes": ["已售完"]
+  }
+]
+```
+
+上面代表：文字同時包含「特C區、5990、剩餘」，或同時包含「特C區、5990、熱賣中」，且不能包含「已售完」。
+
 ## 時間到了沒有執行時
 
 先照這個順序檢查：

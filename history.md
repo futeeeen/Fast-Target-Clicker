@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_00:10:47
+* 新增 `textIncludes_1`, `textIncludes_2` 等多組文字條件，同組內維持 AND，不同組之間改為 OR。
+* 保留原本 `textIncludes` 用法，並可與編號群組一起使用。
+* 無 selector 的文字搜尋會優先選真正可互動元素，再退到 `li/label` 與一般容器，降低誤點外層區塊的機率。
+* Validation: ran `node --check content.js`, `node --check popup.js`, and `node --check background.js`.
+
 ## 2026.05.24_23:52:50
 * 新增 `textIncludes` 與 `textExcludes` 條件，支援同一步必須包含多個文字並排除指定狀態。
 * 有 selector 時會在 selector 結果中再做文字條件篩選；沒有 selector 時會掃描常見可點擊元素並優先選文字較貼近的目標。
