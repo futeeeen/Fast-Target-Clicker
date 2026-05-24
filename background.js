@@ -1,5 +1,15 @@
 const ALARM_NAME = "fast-target-clicker-start";
 
+async function enableSidePanelAction() {
+  if (!chrome.sidePanel?.setPanelBehavior) return;
+
+  try {
+    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+  } catch {
+    // Older Chromium builds may expose sidePanel partially; keep the extension usable.
+  }
+}
+
 async function ensureTabReady(tabId) {
   try {
     await chrome.tabs.sendMessage(tabId, { type: "fast-clicker-ping" });
@@ -28,6 +38,12 @@ async function scheduleStart(tabId, startAtMs) {
     chrome.alarms.create(ALARM_NAME, { when: startAtMs });
   }
 }
+
+enableSidePanelAction();
+
+chrome.runtime.onInstalled.addListener(() => {
+  enableSidePanelAction();
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "fast-clicker-schedule-start") {

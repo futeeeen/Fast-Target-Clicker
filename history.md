@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_00:36:31
+* 新增 Chrome Side Panel 模式，點工具列圖示會在瀏覽器右側開啟 Fast Target Clicker。
+* 移除 action popup 入口，改用右側固定面板呈現設定、倒數與流程狀態。
+* 調整 popup/side panel 寬度樣式，讓同一個畫面在右側面板中更自然。
+* Validation: ran `node --check background.js`, `node --check popup.js`, `node --check content.js`, and parsed `manifest.json`.
+
 ## 2026.05.25_00:31:34
 * 新增勝利獎盃風格的擴充功能 icon，提供 16/32/48/128 px PNG。
 * 更新 manifest 的 extension icon 與 action toolbar icon 設定。
