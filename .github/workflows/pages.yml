@@ -1,4 +1,4 @@
-name: Deploy test site to GitHub Pages
+name: Deploy product site to GitHub Pages
 
 on:
   push:
@@ -28,10 +28,10 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload test site
+      - name: Upload product site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: test-site
+          path: docs
 
       - name: Deploy to GitHub Pages
         id: deployment

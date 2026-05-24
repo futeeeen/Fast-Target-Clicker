@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fast Target Clicker</title>
+    <meta name="description" content="Fast Target Clicker 是一個可設定指定時間、多步驟 JSON、自動等待與文字條件判斷的 Chrome/Edge 點擊流程工具。">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Fast Target Clicker">
+        <img src="assets/icon-48.png" alt="">
+        <span>Fast Target Clicker</span>
+      </a>
+      <nav aria-label="主要導覽">
+        <a href="#features">功能</a>
+        <a href="#workflow">流程</a>
+        <a href="#examples">範例</a>
+        <a href="#guide">使用方式</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Chrome / Edge workflow automation</p>
+          <h1>把指定時間、條件判斷與多步驟點擊整理成一套可重複使用的流程。</h1>
+          <p class="lede">Fast Target Clicker 讓你用 JSON 設定頁面操作：等待目標出現、依文字篩選、選擇下拉選單、勾選 checkbox，並在右側 Side Panel 追蹤目前執行到哪一步。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#examples">看設定範例</a>
+            <a class="button secondary" href="#guide">開始使用</a>
+          </div>
+        </div>
+
+        <div class="product-panel" aria-label="工具介面預覽">
+          <div class="panel-topbar">
+            <span class="panel-dot"></span>
+            <strong>Fast Target Clicker</strong>
+            <span class="panel-status">Side Panel</span>
+          </div>
+          <div class="panel-body">
+            <label class="field">
+              <span>指定開始時間</span>
+              <span class="fake-input">2026/05/25 下午 02:30:00</span>
+            </label>
+            <label class="field">
+              <span>從第幾步開始</span>
+              <span class="fake-input">1</span>
+            </label>
+            <div class="code-card compact">
+              <pre><code>[
+  {
+    "type": "click",
+    "selector": "#buyButton",
+    "waitForMs": 10000
+  },
+  {
+    "type": "select",
+    "selector": "#ticketCount",
+    "value": "2"
+  }
+]</code></pre>
+            </div>
+            <div class="status-card">
+              <span>流程狀態</span>
+              <strong>正在執行第 1 / 2 步</strong>
+              <small>目標：#buyButton</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Core features</p>
+          <h2>為不確定的頁面狀態設計</h2>
+          <p>不需要把每次情境寫死。可以先準備通用規則，再依當天拿到的資訊修改 selector、文字條件或指定步驟。</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-icon">01</span>
+            <h3>右側固定面板</h3>
+            <p>使用 Chrome Side Panel 顯示工具，頁面切換時仍可在右側查看設定、倒數與執行狀態。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">02</span>
+            <h3>指定時間啟動</h3>
+            <p>設定開始時間後由背景服務排程，到時間自動對目前記錄的分頁觸發流程。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">03</span>
+            <h3>多步驟 JSON</h3>
+            <p>支援 click、select、check、fill，適合跨頁流程、表單流程與需要依序操作的情境。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">04</span>
+            <h3>自動等待目標</h3>
+            <p>每一步可設定 waitForMs 與 pollMs，目標還沒出現就持續檢查，逾時會顯示 not found。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">05</span>
+            <h3>文字條件篩選</h3>
+            <p>用 textIncludes、textExcludes 或多組 textIncludes_1、textIncludes_2 判斷狀態文字。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">06</span>
+            <h3>從指定步驟開始</h3>
+            <p>測試或補救時可以從第 N 步往下跑，不必每次都從第一頁重新開始。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="workflow" class="section split-section">
+        <div class="section-heading narrow">
+          <p class="eyebrow">How it works</p>
+          <h2>四個步驟完成一套流程</h2>
+          <p>把當天取得的資訊轉成 JSON，先手動測試，再交給指定時間自動啟動。</p>
+        </div>
+        <ol class="timeline">
+          <li>
+            <span>1</span>
+            <div>
+              <h3>確認目標</h3>
+              <p>從網頁檢查元素取得 CSS selector，或使用按鈕文字、包含文字與排除文字。</p>
+            </div>
+          </li>
+          <li>
+            <span>2</span>
+            <div>
+              <h3>組成 JSON</h3>
+              <p>依序寫下 click、select、check、fill，每一步都可以有自己的等待時間。</p>
+            </div>
+          </li>
+          <li>
+            <span>3</span>
+            <div>
+              <h3>立刻測試</h3>
+              <p>按下立刻測試會先儲存設定，再從指定步驟開始執行，狀態區會顯示卡在哪一步。</p>
+            </div>
+          </li>
+          <li>
+            <span>4</span>
+            <div>
+              <h3>設定時間</h3>
+              <p>保持目標頁面開著，到指定時間時由背景排程觸發同一套流程。</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section id="examples" class="section examples-section">
+        <div class="section-heading">
+          <p class="eyebrow">JSON examples</p>
+          <h2>常用情境設定範例</h2>
+          <p>切換下方情境，右側會顯示可直接放進工具的 JSON。每個範例都可以再依實際網站調整 selector 或文字條件。</p>
+        </div>
+        <div class="examples-layout">
+          <div class="example-tabs" role="tablist" aria-label="設定範例">
+            <button class="tab active" type="button" data-example="basic">指定按鈕流程</button>
+            <button class="tab" type="button" data-example="text">文字狀態判斷</button>
+            <button class="tab" type="button" data-example="or">多組條件 OR</button>
+            <button class="tab" type="button" data-example="form">表單與勾選</button>
+            <button class="tab" type="button" data-example="resume">從指定步驟測試</button>
+          </div>
+          <article class="example-detail">
+            <div class="example-copy">
+              <h3 id="exampleTitle">指定按鈕流程</h3>
+              <p id="exampleDescription">適合目標有穩定 id、class 或完整 selector 的頁面。每一步會等待目標出現，成功後再進下一步。</p>
+            </div>
+            <div class="code-toolbar">
+              <span id="exampleLabel">selector + waitForMs</span>
+              <button id="copyExample" type="button">複製 JSON</button>
+            </div>
+            <pre class="code-card"><code id="exampleCode"></code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section id="guide" class="section guide-section">
+        <div class="section-heading">
+          <p class="eyebrow">User guide</p>
+          <h2>欄位怎麼改</h2>
+          <p>大多數情境只需要修改 selector、文字條件、value 與等待時間。先用立刻測試確認，再設定指定時間。</p>
+        </div>
+        <div class="guide-grid">
+          <article>
+            <h3>selector</h3>
+            <p>最精準的定位方式，例如 <code>#submit</code>、<code>.buy-button</code>、<code>#gameList button</code>。如果 id 以數字開頭，複製到 JSON 時要保留跳脫符號。</p>
+          </article>
+          <article>
+            <h3>textIncludes</h3>
+            <p>陣列內是 AND，全部文字都要出現在同一個元素內才會符合。適合判斷「區域 + 價格 + 狀態」。</p>
+          </article>
+          <article>
+            <h3>textIncludes_1 / _2</h3>
+            <p>不同組之間是 OR，每一組內仍是 AND。適合「A 區可買」或「B 區可買」都可以點的情境。</p>
+          </article>
+          <article>
+            <h3>textExcludes</h3>
+            <p>排除不想點的狀態，例如已售完、不可購買、暫停銷售。符合排除文字的元素會被跳過。</p>
+          </article>
+          <article>
+            <h3>waitForMs / pollMs</h3>
+            <p>waitForMs 是最多等待多久，pollMs 是多久檢查一次。沒有設定時預設最多等 10000ms、每 500ms 檢查一次。</p>
+          </article>
+          <article>
+            <h3>nextDelayMs</h3>
+            <p>成功完成某一步後，額外等一段時間再進下一步。適合已知網站需要動畫或固定轉場時間的頁面。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section reference-section">
+        <div class="section-heading narrow">
+          <p class="eyebrow">Step types</p>
+          <h2>支援的動作</h2>
+        </div>
+        <div class="reference-table" role="table" aria-label="支援動作">
+          <div role="row">
+            <strong role="cell">click</strong>
+            <span role="cell">點擊符合 selector 或文字條件的元素。</span>
+          </div>
+          <div role="row">
+            <strong role="cell">select</strong>
+            <span role="cell">選擇下拉選單指定 value。</span>
+          </div>
+          <div role="row">
+            <strong role="cell">check</strong>
+            <span role="cell">勾選 checkbox，已勾選時不會重複切換。</span>
+          </div>
+          <div role="row">
+            <strong role="cell">fill</strong>
+            <span role="cell">填入 input 或 textarea 的 value。</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Fast Target Clicker</span>
+      <a href="#top">回到上方</a>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

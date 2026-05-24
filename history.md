@@ -1,5 +1,11 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_00:47:22
+* 新增 `docs` 產品介紹頁，包含響應式首頁、功能說明、操作流程、欄位指南與互動式 JSON 範例切換。
+* 將 GitHub Pages workflow 部署來源從 `test-site` 改為 `docs`，讓 Pages 首頁成為正式產品介紹頁。
+* 更新 README，補充產品介紹頁網址與內容定位。
+* Validation: checked static files with Node, parsed `manifest.json`, and reviewed local rendering plus responsive layout rules.
+
 ## 2026.05.25_00:36:31
 * 新增 Chrome Side Panel 模式，點工具列圖示會在瀏覽器右側開啟 Fast Target Clicker。
 * 移除 action popup 入口，改用右側固定面板呈現設定、倒數與流程狀態。

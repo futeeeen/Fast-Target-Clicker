@@ -18,6 +18,16 @@
 - 要固定或取消固定，可使用 Chrome 右側面板上方的釘選控制。
 - 設定、倒數、立刻測試與流程狀態都在同一個右側面板中操作。
 
+## 產品介紹頁
+
+GitHub Pages 會部署 `docs` 內的產品介紹頁：
+
+```text
+https://futeeeen.github.io/Fast-Target-Clicker/
+```
+
+頁面包含工具功能、使用流程、欄位說明與多種 JSON 設定範例。
+
 ## 比賽當天設定
 
 優先使用 CSS selector，因為最快也最準：
