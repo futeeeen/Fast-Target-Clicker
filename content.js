@@ -144,8 +144,7 @@ function scheduleActivationScan() {
   activationTimer = setTimeout(() => {
     const waitForExactTime = () => {
       if (Date.now() >= startAtMs) {
-        hasClicked = false;
-        scanAndClick();
+        runNow({ ignoreEnabled: false });
         return;
       }
 
@@ -188,6 +187,15 @@ async function scanAndClick(options = {}) {
     clickTarget(target);
     return { ok: true, clicked: true };
   }
+}
+
+async function runNow(options = {}) {
+  hasClicked = false;
+  await setWorkflowIndex(0);
+  return scanAndClick({
+    force: true,
+    ignoreEnabled: Boolean(options.ignoreEnabled)
+  });
 }
 
 function parseWorkflowSteps() {
@@ -383,9 +391,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "fast-clicker-run-now") {
+    runNow({ ignoreEnabled: Boolean(message.ignoreEnabled) }).then(sendResponse);
+    return true;
+  }
+
   if (message?.type === "fast-clicker-test") {
-    hasClicked = false;
-    scanAndClick({ force: true, ignoreEnabled: true }).then(sendResponse);
+    runNow({ ignoreEnabled: true }).then(sendResponse);
     return true;
   }
 

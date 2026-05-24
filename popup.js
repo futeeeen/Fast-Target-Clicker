@@ -106,12 +106,23 @@ function updateCountdown(config = readForm()) {
   countdownTimer = setInterval(render, 250);
 }
 
-async function save() {
+async function save(options = {}) {
   const config = readForm();
   await chrome.storage.sync.set(config);
   const tabStatus = await ensureActiveTabReady();
+
+  if (options.runNow && tabStatus.ok) {
+    const result = await sendToActiveTab({
+      type: "fast-clicker-run-now",
+      ignoreEnabled: Boolean(options.ignoreEnabled)
+    }).catch(() => null);
+    updateCountdown(config);
+    setResultStatus(result);
+    return { config, tabStatus, result };
+  }
+
   if (tabStatus.ok && config.enabled && (!config.startAtMs || config.startAtMs <= Date.now())) {
-    await sendToActiveTab({ type: "fast-clicker-scan" }).catch(() => null);
+    await sendToActiveTab({ type: "fast-clicker-run-now", ignoreEnabled: false }).catch(() => null);
   }
   updateCountdown(config);
 
@@ -124,6 +135,8 @@ async function save() {
   } else {
     setStatus("已啟用並儲存");
   }
+
+  return { config, tabStatus };
 }
 
 async function sendToActiveTab(message) {
@@ -169,22 +182,24 @@ async function ensureActiveTabReady() {
 document.querySelector("#save").addEventListener("click", save);
 
 document.querySelector("#test").addEventListener("click", async () => {
-  await save();
   try {
-    const result = await sendToActiveTab({ type: "fast-clicker-test" });
-    if (result?.clicked) {
-      const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
-      setStatus(`已執行${stepText}`);
-    } else if (result?.ok) {
-      const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
-      setStatus(`${stepText} 沒找到目標：${result.reason || "unknown"}`);
-    } else {
-      setStatus(result?.reason || "目前頁面無法測試");
-    }
+    await save({ runNow: true, ignoreEnabled: true });
   } catch {
     setStatus("請重新整理頁面後再測試");
   }
 });
+
+function setResultStatus(result) {
+  if (result?.clicked) {
+    const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
+    setStatus(`已從第一步執行${stepText}`);
+  } else if (result?.ok) {
+    const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
+    setStatus(`${stepText} 沒找到目標：${result.reason || "unknown"}`);
+  } else {
+    setStatus(result?.reason || "目前頁面無法測試");
+  }
+}
 
 document.querySelector("#clearTime").addEventListener("click", async () => {
   fields.startAt.value = "";
