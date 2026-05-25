@@ -1,6 +1,8 @@
-﻿# Playwright Runner Docs
+# Playwright Runner Docs
 
-## 摰?
+這份文件說明 Fast Target Clicker 的 Playwright Runner 版本。此版本會透過 Playwright 啟動瀏覽器並執行 JSON workflow，適合固定環境測試、CLI 腳本化與本機 Web UI 操作。
+
+## 安裝
 
 ```powershell
 cd C:\futen\Project\Auto-click\playwright-runner\package
@@ -8,50 +10,64 @@ npm install
 npx playwright install chromium
 ```
 
-## 雿輻 UI
+## 使用 UI
 
 ```powershell
 cd C:\futen\Project\Auto-click\playwright-runner\package
 npm run ui
 ```
 
-?? `http://127.0.0.1:4280`??
-UI 甈?嚗?
-- `?格? URL`: Playwright 閬??????- `Workflow JSON`: 憭郊撽?蝔?- `??????`: ?唳????銵??征撠望蝡?瑁???- `敺洵撟暹郊??`: 1-based 韏瑕?甇仿???- `slowMo`: 瘥?Playwright action 憿??暹?神蝘??- `headless`: 銝＊蝷箇汗?具?- `摰?敺??汗?灼: workflow 蝯?敺????Playwright browser??
-?身 URL ?荔?
+開啟：
+
+```text
+http://127.0.0.1:4280
+```
+
+UI 欄位：
+
+- `目標 URL`: Playwright 要開啟的頁面。
+- `Workflow JSON`: 多步驟流程設定。
+- `指定開始時間`: 設定後不會自動執行，必須按「開始倒數」才會排程。
+- `從第幾步開始`: 1-based 起始步驟。
+- `slowMo`: 放慢 Playwright action，方便觀察。
+- `headless`: 不顯示瀏覽器視窗。
+- `完成後關閉瀏覽器`: workflow 結束後關閉 Playwright browser。
+
+預設目標 URL：
 
 ```text
 https://futeeeen.github.io/Fast-Target-Clicker/practice/
 ```
 
-???亦毀蝧?蝭???頛?臬??毀蝧??瑁???JSON??
-## 雿輻 CLI
+按「載入練習站範例」會載入可直接用在公開練習站的 JSON。
+
+## 使用 CLI
 
 ```powershell
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json
 ```
 
-????嚗?
+指定時間：
+
 ```powershell
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json --start-at "2026-05-25 14:30:00"
 ```
 
-敺洵 3 甇仿?憪?
+從第 3 步開始：
 
 ```powershell
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json --start-step 3
 ```
 
-## ?舀甈?
+## 步驟欄位
 
-- `type`: `click`?select`?check`?fill`
+- `type`: `click`、`select`、`check`、`fill`
 - `selector`: CSS selector
-- `text`: ??摰蝚血?
-- `ariaLabel`: 靘?`aria-label` / `title` / `name` ??
-- `textIncludes`: ??蝯??AND
-- `textIncludes_1`, `textIncludes_2`: 憭?銋???OR嚗??抒雁??AND
-- `textExcludes`: OR嚗?曆遙銝?摮停頝喲?
-- `waitForMs`: ?憭?敺????身 `10000`
-- `pollMs`: 瑼Ｘ??嚗?閮?`500`
-- `nextDelayMs`: ??摰?閰脫郊撽?憿?蝑?
-
+- `text`: 文字完全符合
+- `ariaLabel`: 比對 `aria-label`、`title`、`name`
+- `textIncludes`: 同一組內為 AND
+- `textIncludes_1`, `textIncludes_2`: 多組為 OR，每組內為 AND
+- `textExcludes`: OR，只要出現任一排除文字就不選
+- `waitForMs`: 最多等待目標出現多久，預設 `10000`
+- `pollMs`: 等待期間多久檢查一次，預設 `500`
+- `nextDelayMs`: 此步驟完成後額外等待多久再進下一步

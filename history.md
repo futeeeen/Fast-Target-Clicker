@@ -1,4 +1,10 @@
 # 專案推送變更紀錄
+## 2026.05.25_13:29:32
+* 修正根目錄 `README.md` 在 GitHub 顯示亂碼的問題，重寫為 UTF-8 可讀中文內容。
+* 同步修正 `playwright-runner/docs/README.md` 與 `playwright-runner/package/README.md` 的亂碼，讓 Playwright Runner 文件維持一致。
+* 補齊 README 中的專案結構、GitHub Pages 路徑、DOM Extension 安裝方式、Playwright UI/CLI 使用方式與 workflow JSON 範例。
+* Validation: checked README files for mojibake/private-use markers and ran git diff whitespace check.
+
 ## 2026.05.25_13:16:03
 * 新增根目錄入口網站資料夾 `project-site`，作為 Fast Target Clicker 的公開首頁，讓使用者可在 DOM / JavaScript Extension 與 Playwright Runner 兩種版本之間選擇。
 * 新增 Playwright Runner HTML 介紹頁，補齊 Web UI、CLI、指定時間、練習站與 workflow JSON 使用說明。

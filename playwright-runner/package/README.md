@@ -1,8 +1,8 @@
-﻿# Fast Target Clicker Playwright Runner
+# Fast Target Clicker Playwright Runner
 
-? Fast Target Clicker ??Playwright ???雿輻??蝔桀?甇仿? JSON 瘚??澆?嚗??芸楛?葫閰衣???函頂蝯望??迂?芸???蝬脩?銝銵?
-甇斤??砌?? stealth plugin嚗?銝?靘??輻雯蝡皜祆?憸冽???賬?
-## 摰?
+Playwright Runner 會用 Playwright 啟動瀏覽器，並依照 JSON workflow 執行點擊、選取、勾選與輸入流程。此版本不包含 stealth plugin。
+
+## 安裝
 
 ```powershell
 cd playwright-runner/package
@@ -10,59 +10,75 @@ npm install
 npx playwright install chromium
 ```
 
-## ?瑁?蝺渡?蝡?靘?
-?撠??寧???璈葫閰衣?嚗?
-```powershell
-..\..\test-site\start-test-site.bat
-```
-
-## 雿輻 UI
+## 啟動 Web UI
 
 ```powershell
 npm run ui
 ```
 
-?亥???嚗?
+開啟：
+
 ```text
 http://127.0.0.1:4280
 ```
 
-UI ?臭誑憛?URL?票 workflow JSON?身摰?摰??絲憪郊撽lowMo?eadless嚗蒂?亦?瘥?甇亙銵???
-?銵?Playwright runner嚗?
+UI 預設目標 URL：
+
+```text
+https://futeeeen.github.io/Fast-Target-Clicker/practice/
+```
+
+## CLI 執行
+
 ```powershell
-cd playwright-runner/package
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json
 ```
 
-## 雿輻 config 瑼?
+使用 config：
+
 ```powershell
 npm start -- --config examples/config.example.json
 ```
 
-## ??????
+指定時間：
 
 ```powershell
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json --start-at "2026-05-25 14:30:00"
 ```
 
-## 敺?摰郊撽?憪?
+從指定步驟開始：
+
 ```powershell
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json --start-step 3
 ```
 
-## ?舀甈?
+## Workflow JSON
 
-- `type`: `click`?select`?check`?fill`
+```json
+[
+  { "type": "click", "selector": "#firstButton" },
+  { "type": "click", "selector": "#quickButtons .quick-button" },
+  {
+    "type": "click",
+    "selector": "div.seat-item",
+    "textIncludes": ["5990"],
+    "waitForMs": 10000
+  },
+  { "type": "select", "selector": "#ticketCount", "value": "2" },
+  { "type": "check", "selector": "#agreeTerms" },
+  { "type": "click", "selector": "#finishButton" }
+]
+```
+
+## 支援欄位
+
+- `type`: `click`、`select`、`check`、`fill`
 - `selector`: CSS selector
-- `text`: ??摰蝚血?
-- `ariaLabel`: 靘?`aria-label` / `title` / `name` ??
-- `textIncludes`: ??蝯??AND
-- `textIncludes_1`, `textIncludes_2`: 憭?銋???OR嚗??抒雁??AND
-- `textExcludes`: OR嚗?曆遙銝?摮停頝喲?
-- `waitForMs`: ?憭?敺????身 `10000`
-- `pollMs`: 瑼Ｘ??嚗?閮?`500`
-- `nextDelayMs`: ??摰?閰脫郊撽?憿?蝑?
-
-## 瘜冽?
-
-Playwright ???湔??銝? Playwright ?批?汗?刻?蝒?銝 Chrome extension side panel?雿?閬?芸楛?桀????????葉??嚗?雿輻 `dom-js-runner/extension` ???
+- `text`: 文字完全符合
+- `ariaLabel`: 比對 `aria-label`、`title`、`name`
+- `textIncludes`: 同一組內為 AND
+- `textIncludes_1`, `textIncludes_2`: 多組為 OR，每組內為 AND
+- `textExcludes`: OR，只要出現任一排除文字就不選
+- `waitForMs`: 最多等待目標出現多久，預設 `10000`
+- `pollMs`: 等待期間多久檢查一次，預設 `500`
+- `nextDelayMs`: 此步驟完成後額外等待多久再進下一步

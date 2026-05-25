@@ -1,28 +1,69 @@
-﻿# Fast Target Clicker
+# Fast Target Clicker
 
-Fast Target Clicker ?臭?蝯閮剖? JSON workflow ???撌亙嚗???璇??嚗?
-- `dom-js-runner`: Chrome/Edge ?游?????? DOM / JavaScript 鈭辣?函???銵?- `playwright-runner`: Playwright ???? CLI ?璈?Web UI ?? Playwright browser ?瑁???- `test-site`: ?祆?蝺渡?蝡???憭?瘚???摮?隞嗚”??selector?摮???id?辣?脰??亥?銵典??????
-## 鞈?憭曄?瑽?
+Fast Target Clicker 是一套可設定 JSON workflow 的自動化流程工具，主要整理成兩種版本：
+
+- `dom-js-runner`: Chrome / Edge 擴充功能，透過目前分頁的 DOM / JavaScript 事件模擬執行流程。
+- `playwright-runner`: Playwright CLI 與本機 Web UI，透過 Playwright browser 執行同一份 workflow JSON。
+- `test-site`: 本機練習站來源，用來測試多頁流程、相同文字按鈕、座位狀態、下拉選單、checkbox 與延遲載入。
+- `project-site`: GitHub Pages 的專案入口網站，可選擇 DOM Extension 或 Playwright Runner 版本。
+
+## 資料夾結構
+
 ```text
 Fast-Target-Clicker/
-?? dom-js-runner/
-?? ?? extension/   Chrome/Edge ?游???祇?
-?? ?? docs/        DOM/JS ???蝝寥?
-?? playwright-runner/
-?? ?? package/     Playwright CLI runner
-?? ?? ui/          Playwright Runner UI
-?? ?? docs/        Playwright ??隞??? test-site/      ?祆?蝺渡?蝡??? README.md
-?? history.md
+├─ project-site/          GitHub Pages 入口網站
+├─ dom-js-runner/
+│  ├─ extension/          Chrome / Edge 擴充功能本體
+│  └─ docs/               DOM Extension 介紹頁與公開練習站
+├─ playwright-runner/
+│  ├─ package/            Playwright CLI runner
+│  ├─ ui/                 Playwright Runner Web UI
+│  └─ docs/               Playwright Runner 介紹頁與文件
+├─ test-site/             本機練習站
+├─ README.md
+└─ history.md
 ```
+
+## 公開頁面
+
+GitHub Pages 會部署成：
+
+```text
+https://futeeeen.github.io/Fast-Target-Clicker/
+```
+
+部署後路徑：
+
+- `/`: 專案入口網站
+- `/dom-js-runner/`: DOM / JavaScript Extension 介紹頁
+- `/playwright-runner/`: Playwright Runner 介紹頁
+- `/practice/`: 公開練習站
 
 ## DOM / JavaScript Extension
 
-摰?嚗?
-1. ?? Chrome ??Edge??2. ?脣 `chrome://extensions` ??`edge://extensions`??3. ?????潔犖?⊥芋撘?4. 暺??交撠????5. ?豢? `C:\futen\Project\Auto-click\dom-js-runner\extension`??
-摰?敺?撌亙??蝷綽???汗?典?湧???Side Panel嚗隞亥票 workflow JSON?身摰?摰????餅葫閰艾??蝔???
+適合已經手動開好目標網頁，想在目前分頁用右側 Side Panel 執行流程的情境。
+
+安裝方式：
+
+1. 打開 Chrome 或 Edge。
+2. 進入 `chrome://extensions` 或 `edge://extensions`。
+3. 開啟「開發人員模式」。
+4. 點「載入未封裝項目」。
+5. 選擇 `C:\futen\Project\Auto-click\dom-js-runner\extension`。
+
+主要功能：
+
+- 使用目前分頁執行 JSON workflow。
+- 支援秒級指定時間、開始倒數、取消倒數。
+- 支援從指定步驟開始。
+- 支援 `click`、`select`、`check`、`fill`。
+- 支援 selector、文字條件、排除文字、自動等待。
+
 ## Playwright Runner UI
 
-蝚砌?甈∪?鋆?
+適合需要 Playwright 啟動瀏覽器、固定測試環境、CLI 腳本化或本機 Web UI 操作的情境。
+
+第一次使用：
 
 ```powershell
 cd C:\futen\Project\Auto-click\playwright-runner\package
@@ -30,17 +71,28 @@ npm install
 npx playwright install chromium
 ```
 
-?? UI嚗?
+啟動 UI：
+
 ```powershell
 npm run ui
 ```
 
-??嚗?
+開啟：
+
 ```text
 http://127.0.0.1:4280
 ```
 
-UI ?臭誑閮剖??格? URL?orkflow JSON??摰?憪??絲憪郊撽lowMo?eadless嚗蒂憿舐內?桀??瑁????
+UI 可設定：
+
+- 目標 URL
+- Workflow JSON
+- 從第幾步開始
+- 指定開始時間與倒數
+- `headless`
+- `slowMo`
+- 完成後是否關閉瀏覽器
+
 ## Playwright CLI
 
 ```powershell
@@ -48,30 +100,42 @@ cd C:\futen\Project\Auto-click\playwright-runner\package
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json
 ```
 
-????嚗?
+指定時間執行：
+
 ```powershell
 npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json --start-at "2026-05-25 14:30:00"
 ```
 
-## ?祆?蝺渡?蝡?
-??嚗?
+從第 3 步開始：
+
+```powershell
+npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json --start-step 3
+```
+
+## 練習站
+
+公開練習站：
+
+```text
+https://futeeeen.github.io/Fast-Target-Clicker/practice/
+```
+
+本機啟動：
+
 ```powershell
 cd C:\futen\Project\Auto-click\test-site
 .\start-test-site.bat
 ```
 
-蝬脣?嚗?
-```text
-https://futeeeen.github.io/Fast-Target-Clicker/practice/
-```
+## Workflow JSON 範例
 
-## Workflow JSON
+兩種 runner 使用同一套 JSON workflow 格式：
 
-?拙?runner ?賭蝙?函餈? JSON workflow 璁艙嚗?
 ```json
 [
   { "type": "click", "selector": "#firstButton" },
   { "type": "click", "selector": "#quickButtons .quick-button" },
+  { "type": "click", "selector": "#secondButton" },
   {
     "type": "click",
     "selector": "div.seat-item",
@@ -85,20 +149,18 @@ https://futeeeen.github.io/Fast-Target-Clicker/practice/
 ]
 ```
 
-撣貊甈?嚗?
-- `type`: `click`?select`?check`?fill`
+常用欄位：
+
+- `type`: `click`、`select`、`check`、`fill`
 - `selector`: CSS selector
-- `text`: ??摰蝚血?
-- `textIncludes`: ????抒 AND
-- `textIncludes_1`, `textIncludes_2`: 憭? OR嚗???AND
-- `textExcludes`: OR嚗?曆遙銝?摮停頝喲?
-- `waitForMs`: ?憭?敺???- `pollMs`: 瑼Ｘ??
-- `nextDelayMs`: ??摰?閰脫郊撽?憿?蝑?
+- `text`: 文字完全符合
+- `textIncludes`: 同一組內為 AND
+- `textIncludes_1`, `textIncludes_2`: 多組條件為 OR，每組內仍為 AND
+- `textExcludes`: OR，只要出現任一排除文字就不選
+- `waitForMs`: 最多等待目標出現多久，預設 `10000`
+- `pollMs`: 等待期間多久檢查一次，預設 `500`
+- `nextDelayMs`: 此步驟完成後額外等待多久再進下一步
 
-## GitHub Pages
+## 注意事項
 
-GitHub Pages ?桀??函蔡 `dom-js-runner/docs`嚗?
-```text
-https://futeeeen.github.io/Fast-Target-Clicker/
-```
-
+本專案提供的是可設定流程執行工具與練習環境。請只在你有權操作、測試或授權的網站與流程中使用。
