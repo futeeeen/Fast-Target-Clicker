@@ -1,5 +1,12 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_10:30:35
+* 將原本 DOM / JavaScript 事件模擬的 Chrome/Edge 擴充功能版移到 `packages/dom-js-extension`，作為獨立可安裝產品資料夾。
+* 新增 `packages/playwright-runner`，提供標準 Playwright CLI 版，支援同樣的 JSON workflow、指定 URL、指定時間、起始步驟、等待目標與文字條件。
+* Playwright 版明確不包含 stealth plugin，也不提供規避網站偵測或風控的能力。
+* 更新產品介紹頁與 README，補充兩種 package 的定位、安裝路徑與使用方式。
+* Validation: parsed `packages/dom-js-extension/manifest.json`, ran `node --check` for extension scripts, docs scripts, and Playwright runner, and generated Playwright runner package lock.
+
 ## 2026.05.25_01:19:39
 * 新增公開練習測試站 `docs/practice`，提供多頁流程、文字條件、表格 selector、數字開頭 id、延遲載入與表單操作情境。
 * 產品介紹頁新增練習站入口與情境說明，讓使用者能直接從首頁進入測試站實作。

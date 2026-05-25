@@ -1,0 +1,12 @@
+[
+  {
+    "type": "click",
+    "selector": "#prepareDelayed"
+  },
+  {
+    "type": "click",
+    "selector": "#delayedTarget",
+    "waitForMs": 8000,
+    "pollMs": 250
+  }
+]

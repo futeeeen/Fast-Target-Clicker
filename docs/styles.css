@@ -477,6 +477,32 @@ pre code {
   color: #e5edf8;
 }
 
+.package-section {
+  background: #ffffff;
+}
+
+.package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.package-grid article {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--surface);
+}
+
+.package-grid p {
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.package-grid p:last-child {
+  margin-bottom: 0;
+}
+
 .schedule-section {
   background: #ffffff;
 }
@@ -637,6 +663,7 @@ pre code {
 
   .feature-grid,
   .guide-grid,
+  .package-grid,
   .schedule-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -664,6 +691,7 @@ pre code {
 
   .feature-grid,
   .guide-grid,
+  .package-grid,
   .schedule-grid,
   .example-tabs {
     grid-template-columns: 1fr;

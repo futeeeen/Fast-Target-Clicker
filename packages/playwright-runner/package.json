@@ -1,0 +1,14 @@
+{
+  "name": "fast-target-clicker-playwright-runner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright runner for Fast Target Clicker JSON workflows.",
+  "scripts": {
+    "start": "node src/runner.mjs",
+    "check": "node --check src/runner.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}

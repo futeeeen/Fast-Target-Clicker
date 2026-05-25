@@ -8,9 +8,16 @@
 2. 進入 `chrome://extensions` 或 `edge://extensions`。
 3. 開啟「開發人員模式」。
 4. 選「載入未封裝項目」。
-5. 選擇這個資料夾：`C:\futen\Project\Auto-click\extension`
+5. 選擇這個資料夾：`C:\futen\Project\Auto-click\packages\dom-js-extension`
 
-`extension` 資料夾就是產品安裝包。要分享給別人安裝時，只需要提供這個資料夾即可。
+`packages\dom-js-extension` 資料夾就是 DOM / JavaScript 事件模擬版的產品安裝包。要分享給別人安裝時，只需要提供這個資料夾即可。
+
+## 產品資料夾
+
+目前專案提供兩種執行方式：
+
+- `packages/dom-js-extension`: Chrome/Edge 擴充功能版，透過 DOM / JavaScript 事件在目前分頁執行流程。
+- `packages/playwright-runner`: Playwright CLI 版，透過 Playwright 開啟獨立瀏覽器執行同樣的 JSON 流程。此版本不包含 stealth plugin，也不提供規避網站偵測或風控的能力。
 
 ## 開啟右側工具面板
 
