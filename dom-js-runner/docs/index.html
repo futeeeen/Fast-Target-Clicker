@@ -170,8 +170,8 @@
       <section id="install" class="section install-section">
         <div class="section-heading">
           <p class="eyebrow">Install</p>
-          <h2>只要載入 packages/dom-js-extension 資料夾就能安裝</h2>
-          <p>專案根目錄保留文件、產品介紹頁與測試頁；可安裝的 Chrome/Edge 擴充功能集中在 <code>packages/dom-js-extension</code>。分享 DOM / JavaScript 事件模擬版本時，只需要提供這個資料夾。</p>
+          <h2>只要載入 dom-js-runner/extension 資料夾就能安裝</h2>
+          <p>專案根目錄保留兩條產品線與測試頁；可安裝的 Chrome/Edge 擴充功能集中在 <code>dom-js-runner/extension</code>。分享 DOM / JavaScript 事件模擬版本時，只需要提供這個資料夾。</p>
         </div>
         <div class="install-layout">
           <ol class="install-steps">
@@ -185,7 +185,7 @@
             </li>
             <li>
               <span>3</span>
-              <p>選擇專案內的 <code>packages/dom-js-extension</code> 資料夾。</p>
+              <p>選擇專案內的 <code>dom-js-runner/extension</code> 資料夾。</p>
             </li>
             <li>
               <span>4</span>
@@ -195,11 +195,14 @@
           <div class="folder-card" aria-label="資料夾結構">
             <strong>專案結構</strong>
             <pre><code>Fast-Target-Clicker/
-├─ packages/
-│  ├─ dom-js-extension/   DOM / JavaScript 擴充功能版
-│  └─ playwright-runner/  Playwright CLI 版
-├─ docs/                  產品介紹網站
-├─ test-site/             本機練習站
+├─ dom-js-runner/
+│  ├─ extension/   DOM / JavaScript 擴充功能版
+│  └─ docs/        產品介紹網站
+├─ playwright-runner/
+│  ├─ package/     Playwright CLI runner
+│  ├─ ui/          Playwright Runner UI
+│  └─ docs/        Playwright 版文件
+├─ test-site/      本機練習站
 ├─ README.md
 └─ history.md</code></pre>
           </div>
@@ -215,12 +218,12 @@
         <div class="package-grid">
           <article>
             <h3>DOM / JavaScript Extension</h3>
-            <p>位置：<code>packages/dom-js-extension</code></p>
+            <p>位置：<code>dom-js-runner/extension</code></p>
             <p>透過 Chrome content script 在目前分頁尋找元素並觸發 DOM 事件，提供右側 Side Panel、指定時間、流程狀態與起始步驟設定。</p>
           </article>
           <article>
             <h3>Playwright Runner</h3>
-            <p>位置：<code>packages/playwright-runner</code></p>
+            <p>位置：<code>playwright-runner/package</code> 與 <code>playwright-runner/ui</code></p>
             <p>透過 Playwright CLI 執行同樣的 JSON 流程格式，支援指定 URL、指定時間、起始步驟、等待目標與文字條件。此版本不包含 stealth plugin。</p>
           </article>
         </div>

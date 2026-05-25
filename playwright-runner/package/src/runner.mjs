@@ -1,11 +1,10 @@
-#!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const DEFAULT_WAIT_FOR_MS = 10000;
 const DEFAULT_POLL_MS = 500;
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const args = {
     headless: false,
     startStep: 1
@@ -45,7 +44,7 @@ function parseArgs(argv) {
   return args;
 }
 
-function printHelp() {
+export function printHelp() {
   console.log(`
 Fast Target Clicker Playwright Runner
 
@@ -69,7 +68,7 @@ async function readJson(path) {
   return JSON.parse(text);
 }
 
-async function loadConfig(args) {
+export async function loadConfig(args) {
   let config = {};
 
   if (args.configPath) {
@@ -97,7 +96,7 @@ async function loadConfig(args) {
   };
 }
 
-function parseStartAt(value) {
+export function parseStartAt(value) {
   if (!value) return 0;
 
   const normalized = String(value).trim().replace(" ", "T");
@@ -109,15 +108,19 @@ function parseStartAt(value) {
   return timestamp;
 }
 
-async function waitUntil(timestamp) {
+export async function waitUntil(timestamp, onStatus = () => {}) {
   const remaining = timestamp - Date.now();
   if (remaining <= 0) return;
 
-  console.log(`Waiting ${remaining}ms until scheduled start...`);
+  onStatus({
+    type: "waiting",
+    message: `Waiting ${remaining}ms until scheduled start...`,
+    remainingMs: remaining
+  });
   await new Promise((resolve) => setTimeout(resolve, remaining));
 }
 
-function stepLabel(step) {
+export function stepLabel(step) {
   if (step.selector) return step.selector;
   if (step.text) return `text=${step.text}`;
   if (step.ariaLabel) return `aria=${step.ariaLabel}`;
@@ -209,8 +212,15 @@ async function waitForTarget(page, step) {
   return null;
 }
 
-async function runStep(page, step, index, total) {
-  console.log(`Step ${index + 1}/${total}: ${step.type} ${stepLabel(step)}`);
+async function runStep(page, step, index, total, onStatus = () => {}) {
+  onStatus({
+    type: "step-start",
+    step: index + 1,
+    total,
+    action: step.type,
+    target: stepLabel(step),
+    message: `Step ${index + 1}/${total}: ${step.type} ${stepLabel(step)}`
+  });
 
   const target = await waitForTarget(page, step);
   if (!target) {
@@ -230,20 +240,83 @@ async function runStep(page, step, index, total) {
   }
 
   if (step.nextDelayMs) {
+    onStatus({
+      type: "step-delay",
+      step: index + 1,
+      total,
+      delayMs: Number(step.nextDelayMs),
+      message: `Waiting nextDelayMs ${step.nextDelayMs}ms`
+    });
     await page.waitForTimeout(Number(step.nextDelayMs));
   }
+
+  onStatus({
+    type: "step-complete",
+    step: index + 1,
+    total,
+    message: `Step ${index + 1}/${total} completed.`
+  });
 }
 
-async function runWorkflow(page, workflow, startStep) {
+export async function runWorkflow(page, workflow, startStep, onStatus = () => {}) {
   const startIndex = Math.max(0, Number(startStep || 1) - 1);
 
   for (let index = startIndex; index < workflow.length; index += 1) {
-    await runStep(page, workflow[index], index, workflow.length);
+    await runStep(page, workflow[index], index, workflow.length, onStatus);
   }
 }
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
+export async function runWithConfig(config, onStatus = () => {}) {
+  if (!config.url) {
+    throw new Error("Missing URL. Provide --url or config.url.");
+  }
+
+  if (!Array.isArray(config.workflow) || config.workflow.length === 0) {
+    throw new Error("Workflow is empty. Provide a JSON array with at least one step.");
+  }
+
+  await waitUntil(parseStartAt(config.startAt), onStatus);
+
+  onStatus({
+    type: "browser-launch",
+    message: "Launching browser..."
+  });
+
+  const browser = await chromium.launch({
+    headless: Boolean(config.headless),
+    slowMo: Number(config.slowMo || 0)
+  });
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  try {
+    onStatus({
+      type: "navigation",
+      url: config.url,
+      message: `Opening ${config.url}`
+    });
+    await page.goto(config.url, { waitUntil: "domcontentloaded" });
+    await runWorkflow(page, config.workflow, config.startStep, onStatus);
+    onStatus({
+      type: "complete",
+      message: "Workflow completed."
+    });
+  } catch (error) {
+    onStatus({
+      type: "error",
+      message: error.message
+    });
+    throw error;
+  } finally {
+    if (config.headless || config.closeOnFinish) {
+      await browser.close();
+    }
+  }
+}
+
+export async function main(argv = process.argv.slice(2)) {
+  const args = parseArgs(argv);
   if (args.help) {
     printHelp();
     return;
@@ -254,28 +327,12 @@ async function main() {
     throw new Error("Missing URL. Provide --url or config.url.");
   }
 
-  await waitUntil(parseStartAt(config.startAt));
-
-  const browser = await chromium.launch({
-    headless: config.headless,
-    slowMo: config.slowMo
-  });
-
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  try {
-    await page.goto(config.url, { waitUntil: "domcontentloaded" });
-    await runWorkflow(page, config.workflow, config.startStep);
-    console.log("Workflow completed.");
-  } finally {
-    if (config.headless) {
-      await browser.close();
-    }
-  }
+  await runWithConfig(config, (event) => console.log(event.message));
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+if (import.meta.url === `file:///${process.argv[1]?.replaceAll("\\", "/")}`) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}

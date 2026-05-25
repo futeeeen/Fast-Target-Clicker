@@ -7,7 +7,7 @@
 ## 安裝
 
 ```powershell
-cd packages/playwright-runner
+cd playwright-runner/package
 npm install
 npx playwright install chromium
 ```
@@ -17,13 +17,27 @@ npx playwright install chromium
 先在專案根目錄啟動本機測試站：
 
 ```powershell
-.\start-test-site.bat
+..\..\test-site\start-test-site.bat
 ```
+
+## 使用 UI
+
+```powershell
+npm run ui
+```
+
+接著開啟：
+
+```text
+http://127.0.0.1:4280
+```
+
+UI 可以填 URL、貼 workflow JSON、設定指定時間、起始步驟、slowMo、headless，並查看每一步執行狀態。
 
 再執行 Playwright runner：
 
 ```powershell
-cd packages/playwright-runner
+cd playwright-runner/package
 npm start -- --url http://127.0.0.1:4173/test-site/index.html --workflow examples/practice-flow.json
 ```
 
@@ -60,4 +74,4 @@ npm start -- --url http://127.0.0.1:4173/test-site/index.html --workflow example
 
 ## 注意
 
-Playwright 版會直接開啟一個由 Playwright 控制的瀏覽器視窗，不是 Chrome extension side panel。若你需要在自己目前手動開啟的分頁中操作，請使用 `packages/dom-js-extension` 版本。
+Playwright 版會直接開啟一個由 Playwright 控制的瀏覽器視窗，不是 Chrome extension side panel。若你需要在自己目前手動開啟的分頁中操作，請使用 `dom-js-runner/extension` 版本。

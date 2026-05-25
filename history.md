@@ -1,5 +1,13 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_11:02:34
+* 重新整理根目錄，拆成 `dom-js-runner`、`playwright-runner`、`test-site` 三個主要資料夾，保留根目錄 `README.md` 與 `history.md`。
+* 將 DOM / JavaScript 擴充功能版移到 `dom-js-runner/extension`，並將產品介紹頁移到 `dom-js-runner/docs`。
+* 將 Playwright 產品線整理成 `playwright-runner/package`、`playwright-runner/docs`、`playwright-runner/ui`。
+* 新增 Playwright Runner UI，可用瀏覽器填 URL、貼 workflow JSON、設定指定時間/起始步驟/slowMo/headless，並查看執行狀態。
+* 更新 GitHub Pages workflow，改由 `dom-js-runner/docs` 部署產品介紹頁。
+* Validation: ran syntax checks for DOM runner scripts, Playwright runner, Playwright UI server/client, docs scripts, and parsed extension manifest.
+
 ## 2026.05.25_10:30:35
 * 將原本 DOM / JavaScript 事件模擬的 Chrome/Edge 擴充功能版移到 `packages/dom-js-extension`，作為獨立可安裝產品資料夾。
 * 新增 `packages/playwright-runner`，提供標準 Playwright CLI 版，支援同樣的 JSON workflow、指定 URL、指定時間、起始步驟、等待目標與文字條件。
