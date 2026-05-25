@@ -10,7 +10,7 @@
     <main>
       <header>
         <h1>Fast Target Clicker</h1>
-        <label class="switch">
+        <label class="switch" title="Enable background workflow">
           <input id="enabled" type="checkbox">
           <span></span>
         </label>
@@ -21,10 +21,10 @@
         <input id="startAt" type="datetime-local" step="1">
       </label>
 
-      <p id="countdown" class="countdown" aria-live="polite">未設定倒數</p>
+      <p id="countdown" class="countdown" aria-live="polite">尚未開始倒數</p>
 
       <section class="workflow-panel">
-        <h2>多步驟 JSON 流程</h2>
+        <h2>進階多步驟流程</h2>
         <label>
           步驟 JSON
           <textarea id="workflowSteps" spellcheck="false" rows="10" placeholder='[{"type":"click","selector":"#firstButton"}]'></textarea>
@@ -44,9 +44,11 @@
         </section>
       </section>
 
-      <div class="actions">
+      <div class="actions main-actions">
         <button id="save" type="button">儲存設定</button>
         <button id="test" type="button">立刻測試</button>
+        <button id="startCountdown" type="button">開始倒數</button>
+        <button id="cancelCountdown" type="button">取消倒數</button>
         <button id="clearTime" type="button">清除時間</button>
       </div>
 

@@ -162,6 +162,13 @@ button[type="button"] {
   font-weight: 800;
 }
 
+.countdown-text {
+  min-height: 24px;
+  margin-bottom: 0;
+  color: var(--green);
+  font-weight: 850;
+}
+
 .event-log {
   display: grid;
   gap: 8px;

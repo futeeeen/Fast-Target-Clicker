@@ -124,6 +124,10 @@ textarea:focus {
   gap: 8px;
 }
 
+.main-actions {
+  grid-template-columns: 1fr 1fr;
+}
+
 button {
   min-height: 38px;
   border: 0;

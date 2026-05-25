@@ -27,11 +27,12 @@ async function ensureTabReady(tabId) {
   }
 }
 
-async function scheduleStart(tabId, startAtMs) {
+async function scheduleStart(tabId, startAtMs, startStep) {
   await chrome.alarms.clear(ALARM_NAME);
   await chrome.storage.local.set({
     scheduledTabId: tabId || 0,
-    scheduledStartAtMs: Number(startAtMs || 0)
+    scheduledStartAtMs: Number(startAtMs || 0),
+    scheduledStartStep: Math.max(1, Math.floor(Number(startStep || 1)))
   });
 
   if (tabId && startAtMs && startAtMs > Date.now()) {
@@ -47,12 +48,19 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "fast-clicker-schedule-start") {
-    scheduleStart(message.tabId, message.startAtMs).then(() => sendResponse({ ok: true }));
+    scheduleStart(message.tabId, message.startAtMs, message.startStep).then(() => sendResponse({ ok: true }));
     return true;
   }
 
   if (message?.type === "fast-clicker-clear-start") {
-    chrome.alarms.clear(ALARM_NAME).then(() => sendResponse({ ok: true }));
+    Promise.all([
+      chrome.alarms.clear(ALARM_NAME),
+      chrome.storage.local.set({
+        scheduledTabId: 0,
+        scheduledStartAtMs: 0,
+        scheduledStartStep: 1
+      })
+    ]).then(() => sendResponse({ ok: true }));
     return true;
   }
 
@@ -72,7 +80,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== ALARM_NAME) return;
 
-  const { scheduledTabId } = await chrome.storage.local.get({ scheduledTabId: 0 });
+  const { scheduledTabId, scheduledStartStep } = await chrome.storage.local.get({
+    scheduledTabId: 0,
+    scheduledStartStep: 1
+  });
   if (!scheduledTabId) return;
 
   const ready = await ensureTabReady(scheduledTabId);
@@ -80,6 +91,13 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
   await chrome.tabs.sendMessage(scheduledTabId, {
     type: "fast-clicker-run-now",
-    ignoreEnabled: false
+    ignoreEnabled: true,
+    startStep: scheduledStartStep
   }).catch(() => {});
+
+  await chrome.storage.local.set({
+    scheduledTabId: 0,
+    scheduledStartAtMs: 0,
+    scheduledStartStep: 1
+  });
 });

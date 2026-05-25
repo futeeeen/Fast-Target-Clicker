@@ -1,4 +1,16 @@
 # 專案推送變更紀錄
+## 2026.05.25_13:16:03
+* 新增根目錄入口網站資料夾 `project-site`，作為 Fast Target Clicker 的公開首頁，讓使用者可在 DOM / JavaScript Extension 與 Playwright Runner 兩種版本之間選擇。
+* 新增 Playwright Runner HTML 介紹頁，補齊 Web UI、CLI、指定時間、練習站與 workflow JSON 使用說明。
+* 更新 GitHub Pages workflow，改為打包 `project-site`、`dom-js-runner/docs`、`playwright-runner/docs`，並保留根路徑 `/practice/` 練習站。
+* Validation: built a temporary Pages artifact locally and confirmed root, DOM runner, Playwright runner, and practice pages exist; ran JS syntax checks and git diff whitespace check.
+
+## 2026.05.25_11:40:15
+* 優化 Playwright Runner UI 指定時間功能：時間欄位支援秒級，設定時間不會自動執行，必須按 Start Countdown 才開始倒數。
+* Playwright Runner UI 新增 Cancel Countdown，倒數時間到會觸發同一個 Run Now 流程，並保留立即執行的獨立行為。
+* 優化 DOM extension 指定時間功能：儲存設定不再建立背景排程，只有按開始倒數才建立 Chrome alarm。
+* DOM extension 新增取消倒數，取消時會清除 alarm 與背景儲存的 scheduled tab/time/start step。
+* Validation: ran Node syntax checks for Playwright UI/server and DOM extension scripts, ran Playwright runner package check, started UI server, and verified countdown/cancel behavior with Playwright.
 
 ## 2026.05.25_11:24:10
 * 將 Playwright Runner UI 的目標 URL 預設改為 `https://futeeeen.github.io/Fast-Target-Clicker/practice/`。

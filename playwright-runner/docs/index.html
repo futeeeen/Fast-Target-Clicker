@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Playwright Runner | Fast Target Clicker</title>
+    <meta name="description" content="Fast Target Clicker Playwright Runner 介紹與使用方式。">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="../">Fast Target Clicker</a>
+      <nav aria-label="主要導覽">
+        <a href="../">入口首頁</a>
+        <a href="../dom-js-runner/">DOM Extension</a>
+        <a href="../practice/">練習站</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Playwright CLI / Web UI</p>
+        <h1>用 Playwright 執行可重複測試的多步驟流程。</h1>
+        <p class="lede">Playwright Runner 使用和 DOM Extension 相同的 workflow JSON，但由 Playwright 啟動瀏覽器並執行流程。適合自動化測試、固定環境驗證、CLI 腳本化執行，以及透過 Web UI 操作。</p>
+        <div class="actions">
+          <a class="button primary" href="#install">安裝方式</a>
+          <a class="button secondary" href="#examples">設定範例</a>
+        </div>
+      </section>
+
+      <section class="section cards">
+        <article>
+          <h2>Web UI</h2>
+          <p>填入目標 URL、貼上 workflow JSON、設定起始步驟、slowMo、headless 與指定時間。按下「立刻執行」會馬上開始；按下「開始倒數」才會進入排程倒數。</p>
+        </article>
+        <article>
+          <h2>CLI Runner</h2>
+          <p>可用 `npm start -- --url ... --workflow ...` 在命令列執行同一份 JSON，適合固定流程、批次測試或和其他工具串接。</p>
+        </article>
+        <article>
+          <h2>狀態回報</h2>
+          <p>執行時會回報目前步驟、等待狀態、找不到目標的錯誤，以及流程完成訊息，方便判斷卡在哪一步。</p>
+        </article>
+      </section>
+
+      <section id="install" class="section split">
+        <div>
+          <p class="eyebrow">Install</p>
+          <h2>安裝與啟動 UI</h2>
+          <p>第一次使用先安裝套件與 Chromium，之後可直接啟動 UI。</p>
+        </div>
+        <pre><code>cd C:\futen\Project\Auto-click\playwright-runner\package
+npm install
+npx playwright install chromium
+npm run ui</code></pre>
+      </section>
+
+      <section class="section split">
+        <div>
+          <p class="eyebrow">Default target</p>
+          <h2>預設練習站</h2>
+          <p>UI 預設目標 URL 會指向公開練習站，可直接載入練習站範例 JSON 測試。</p>
+        </div>
+        <pre><code>https://futeeeen.github.io/Fast-Target-Clicker/practice/</code></pre>
+      </section>
+
+      <section id="examples" class="section split">
+        <div>
+          <p class="eyebrow">Workflow JSON</p>
+          <h2>練習站流程範例</h2>
+          <p>這份 JSON 會依序點第一頁按鈕、選任一快速按鈕、進入座位頁、選擇 5990 座位、選數量、勾選 checkbox 並完成。</p>
+        </div>
+        <pre><code>[
+  { "type": "click", "selector": "#firstButton" },
+  { "type": "click", "selector": "#quickButtons .quick-button" },
+  { "type": "click", "selector": "#secondButton" },
+  {
+    "type": "click",
+    "selector": "div.seat-item",
+    "textIncludes": ["5990"],
+    "waitForMs": 10000
+  },
+  { "type": "select", "selector": "#ticketCount", "value": "2" },
+  { "type": "check", "selector": "#agreeTerms" },
+  { "type": "click", "selector": "#finishButton" }
+]</code></pre>
+      </section>
+
+      <section class="section split">
+        <div>
+          <p class="eyebrow">CLI</p>
+          <h2>命令列執行</h2>
+          <p>若不需要 UI，也可以直接用 CLI 跑同一份 workflow。</p>
+        </div>
+        <pre><code>npm start -- --url https://futeeeen.github.io/Fast-Target-Clicker/practice/ --workflow examples/practice-flow.json</code></pre>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Playwright Runner</span>
+      <a href="../">回入口首頁</a>
+    </footer>
+  </body>
+</html>

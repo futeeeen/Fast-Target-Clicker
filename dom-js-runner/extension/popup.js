@@ -1,5 +1,5 @@
 const DEFAULT_CONFIG = {
-  enabled: false,
+  enabled: true,
   selector: "",
   text: "",
   ariaLabel: "",
@@ -24,14 +24,16 @@ const status = document.querySelector("#status");
 const countdown = document.querySelector("#countdown");
 const workflowStatus = document.querySelector("#workflowStatus");
 const workflowTarget = document.querySelector("#workflowTarget");
-let countdownTimer = null;
-let workflowStatusTimer = null;
+
+let countdownTimer = 0;
+let workflowStatusTimer = 0;
+let scheduledStartAtMs = 0;
 
 function setStatus(message) {
   status.textContent = message;
-  setTimeout(() => {
+  window.setTimeout(() => {
     if (status.textContent === message) status.textContent = "";
-  }, 2500);
+  }, 3000);
 }
 
 function readForm() {
@@ -62,11 +64,10 @@ function toDateTimeLocalValue(ms) {
 }
 
 function writeForm(config) {
-  fields.enabled.checked = config.enabled;
+  fields.enabled.checked = Boolean(config.enabled);
   fields.startAt.value = toDateTimeLocalValue(config.startAtMs);
-  fields.workflowSteps.value = config.workflowSteps;
+  fields.workflowSteps.value = config.workflowSteps || "";
   fields.workflowStartStep.value = config.workflowStartStep || 1;
-  updateCountdown(config);
 }
 
 function formatDuration(ms) {
@@ -80,53 +81,46 @@ function formatDuration(ms) {
     .join(":");
 }
 
-function updateCountdown(config = readForm()) {
-  if (countdownTimer) clearInterval(countdownTimer);
-
-  if (!config.startAtMs) {
-    countdown.textContent = "未設定倒數";
+function renderCountdown() {
+  if (!scheduledStartAtMs) {
+    countdown.textContent = "尚未開始倒數";
     return;
   }
 
-  const render = () => {
-    const diff = config.startAtMs - Date.now();
-    countdown.textContent = diff > 0 ? `倒數 ${formatDuration(diff)}` : "時間已到，正在執行";
-  };
+  const diff = scheduledStartAtMs - Date.now();
+  countdown.textContent = diff > 0
+    ? `倒數 ${formatDuration(diff)}`
+    : "時間已到，正在執行";
 
-  render();
-  countdownTimer = setInterval(render, 250);
+  if (diff <= 0 && countdownTimer) {
+    window.clearInterval(countdownTimer);
+    countdownTimer = 0;
+  }
 }
 
-async function save(options = {}) {
+function startCountdownDisplay(startAtMs) {
+  scheduledStartAtMs = Number(startAtMs || 0);
+  if (countdownTimer) window.clearInterval(countdownTimer);
+  renderCountdown();
+  if (scheduledStartAtMs > Date.now()) {
+    countdownTimer = window.setInterval(renderCountdown, 200);
+  }
+}
+
+async function saveSettings() {
   const config = readForm();
+  JSON.parse(config.workflowSteps || "[]");
   await chrome.storage.sync.set(config);
-  const tabStatus = await ensureActiveTabReady();
-  await scheduleActiveTabStart(config, tabStatus);
+  return config;
+}
 
-  if (options.runNow && tabStatus.ok) {
-    const result = await sendToActiveTab({
-      type: "fast-clicker-run-now",
-      ignoreEnabled: Boolean(options.ignoreEnabled),
-      startStep: config.workflowStartStep
-    }).catch(() => null);
-    updateCountdown(config);
-    setResultStatus(result);
-    return { config, tabStatus, result };
+async function save() {
+  try {
+    await saveSettings();
+    setStatus("設定已儲存。尚未開始倒數。");
+  } catch (error) {
+    setStatus(error.message);
   }
-
-  updateCountdown(config);
-
-  if (!tabStatus.ok) {
-    setStatus(tabStatus.message);
-  } else if (!config.enabled) {
-    setStatus("已儲存，尚未啟用");
-  } else if (config.startAtMs > Date.now()) {
-    setStatus("已啟用，等待指定時間");
-  } else {
-    setStatus("已啟用並儲存");
-  }
-
-  return { config, tabStatus };
 }
 
 async function sendToActiveTab(message) {
@@ -143,11 +137,11 @@ async function getActiveTab() {
 async function ensureActiveTabReady() {
   const tab = await getActiveTab();
   if (!tab?.id || !tab.url) {
-    return { ok: false, message: "找不到目前分頁" };
+    return { ok: false, message: "找不到目前分頁。" };
   }
 
   if (!/^https?:|^file:/.test(tab.url)) {
-    return { ok: false, message: "此頁面不允許執行" };
+    return { ok: false, message: "這個頁面不能執行 content script。" };
   }
 
   try {
@@ -162,46 +156,85 @@ async function ensureActiveTabReady() {
       return { ok: true };
     } catch {
       if (tab.url.startsWith("file:")) {
-        return { ok: false, message: "請在擴充功能詳細資料開啟：允許存取檔案網址" };
+        return { ok: false, message: "file 頁面需要先允許擴充功能存取檔案網址。" };
       }
-      return { ok: false, message: "無法注入目前分頁，請重新整理頁面" };
+      return { ok: false, message: "無法載入 content script，請重新整理頁面後再試。" };
     }
   }
 }
 
-async function scheduleActiveTabStart(config, tabStatus) {
-  if (!tabStatus.ok || !config.enabled || !config.startAtMs || config.startAtMs <= Date.now()) {
-    await chrome.runtime.sendMessage({ type: "fast-clicker-clear-start" }).catch(() => null);
-    return;
-  }
-
-  const tab = await getActiveTab();
-  await chrome.runtime.sendMessage({
-    type: "fast-clicker-schedule-start",
-    tabId: tab?.id || 0,
-    startAtMs: config.startAtMs
-  }).catch(() => null);
+async function clearScheduledStart() {
+  await chrome.runtime.sendMessage({ type: "fast-clicker-clear-start" }).catch(() => null);
+  startCountdownDisplay(0);
 }
 
-document.querySelector("#save").addEventListener("click", save);
-
-document.querySelector("#test").addEventListener("click", async () => {
+async function runImmediately() {
   try {
-    await save({ runNow: true, ignoreEnabled: true });
-  } catch {
-    setStatus("請重新整理頁面後再測試");
+    const config = await saveSettings();
+    await clearScheduledStart();
+
+    const tabStatus = await ensureActiveTabReady();
+    if (!tabStatus.ok) {
+      setStatus(tabStatus.message);
+      return;
+    }
+
+    const result = await sendToActiveTab({
+      type: "fast-clicker-run-now",
+      ignoreEnabled: true,
+      startStep: config.workflowStartStep
+    }).catch(() => null);
+    setResultStatus(result);
+  } catch (error) {
+    setStatus(error.message);
   }
-});
+}
+
+async function armScheduledStart() {
+  try {
+    const config = await saveSettings();
+    const startAtMs = Number(config.startAtMs || 0);
+
+    if (!startAtMs || !Number.isFinite(startAtMs)) {
+      setStatus("請先設定指定開始時間。");
+      return;
+    }
+
+    if (startAtMs <= Date.now()) {
+      setStatus("指定開始時間必須晚於現在。");
+      return;
+    }
+
+    const tabStatus = await ensureActiveTabReady();
+    if (!tabStatus.ok) {
+      setStatus(tabStatus.message);
+      return;
+    }
+
+    const tab = await getActiveTab();
+    await chrome.runtime.sendMessage({
+      type: "fast-clicker-schedule-start",
+      tabId: tab?.id || 0,
+      startAtMs,
+      startStep: config.workflowStartStep
+    });
+
+    startCountdownDisplay(startAtMs);
+    setStatus("倒數已開始，時間到會立刻執行。");
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
 
 function setResultStatus(result) {
   if (result?.clicked) {
     const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
-    setStatus(`已從第一步執行${stepText}`);
+    setStatus(`已執行 ${stepText}`);
   } else if (result?.ok) {
     const stepText = Number.isInteger(result.index) ? `第 ${result.index + 1} 步` : "";
-    setStatus(`${stepText} 沒找到目標：${result.reason || "unknown"}`);
+    setStatus(`${stepText} 未找到目標：${result.reason || "unknown"}`);
   } else {
-    setStatus(result?.reason || "目前頁面無法測試");
+    setStatus(result?.reason || "執行失敗，請確認頁面是否已重新整理。");
   }
 }
 
@@ -230,7 +263,9 @@ function renderWorkflowStatus(data) {
   } else if (data.state === "waiting") {
     workflowStatus.textContent = "等待指定時間";
   } else if (data.state === "reset") {
-    workflowStatus.textContent = Number.isInteger(data.index) ? `已重設到第 ${data.index + 1} 步` : "已重設流程";
+    workflowStatus.textContent = Number.isInteger(data.index)
+      ? `已重設到第 ${data.index + 1} 步`
+      : "已重設流程";
   } else {
     workflowStatus.textContent = `${step}: ${data.reason || data.state || "unknown"}`;
   }
@@ -243,33 +278,6 @@ async function refreshWorkflowStatus() {
   renderWorkflowStatus(result.workflowStatus);
 }
 
-document.querySelector("#clearTime").addEventListener("click", async () => {
-  fields.startAt.value = "";
-  await save();
-});
-
-document.querySelector("#sampleWorkflow").addEventListener("click", async () => {
-  fields.workflowEnabled.checked = true;
-  fields.workflowSteps.value = JSON.stringify([
-    { type: "click", selector: "#firstButton" },
-    { type: "click", text: "趕快點我" },
-    { type: "click", selector: "#secondButton" },
-    { type: "click", selector: "div.seat-item" },
-    { type: "select", selector: "#ticketCount", value: "2" },
-    { type: "check", selector: "#agreeTerms" },
-    { type: "click", selector: "#finishButton" }
-  ], null, 2);
-  fields.workflowStartStep.value = "1";
-  setStatus("已載入範例，尚未儲存");
-});
-
-document.querySelector("#resetWorkflow").addEventListener("click", async () => {
-  await resetActiveTabWorkflow();
-  await chrome.storage.local.set({ workflowStatus: null }).catch(() => null);
-  renderWorkflowStatus(null);
-  setStatus("已重設流程進度");
-});
-
 async function resetActiveTabWorkflow() {
   const config = readForm();
   await ensureActiveTabReady();
@@ -279,11 +287,58 @@ async function resetActiveTabWorkflow() {
   }).catch(() => null);
 }
 
-fields.enabled.addEventListener("change", save);
-fields.startAt.addEventListener("change", () => updateCountdown());
+document.querySelector("#save").addEventListener("click", save);
+document.querySelector("#test").addEventListener("click", runImmediately);
+document.querySelector("#startCountdown").addEventListener("click", armScheduledStart);
+document.querySelector("#cancelCountdown").addEventListener("click", async () => {
+  await clearScheduledStart();
+  setStatus("倒數已取消。");
+});
 
-chrome.storage.sync.get(DEFAULT_CONFIG).then((config) => {
+document.querySelector("#clearTime").addEventListener("click", async () => {
+  fields.startAt.value = "";
+  await saveSettings();
+  await clearScheduledStart();
+  setStatus("時間已清除。");
+});
+
+document.querySelector("#sampleWorkflow").addEventListener("click", () => {
+  fields.workflowSteps.value = JSON.stringify([
+    { type: "click", selector: "#firstButton" },
+    { type: "click", selector: "#quickButtons .quick-button" },
+    { type: "click", selector: "#secondButton" },
+    { type: "click", selector: "div.seat-item", textIncludes: ["5990"], waitForMs: 10000 },
+    { type: "select", selector: "#ticketCount", value: "2" },
+    { type: "check", selector: "#agreeTerms" },
+    { type: "click", selector: "#finishButton" }
+  ], null, 2);
+  fields.workflowStartStep.value = "1";
+  setStatus("範例已載入，尚未執行。");
+});
+
+document.querySelector("#resetWorkflow").addEventListener("click", async () => {
+  await resetActiveTabWorkflow();
+  await chrome.storage.local.set({ workflowStatus: null }).catch(() => null);
+  renderWorkflowStatus(null);
+  setStatus("流程進度已重設。");
+});
+
+fields.enabled.addEventListener("change", save);
+fields.startAt.addEventListener("change", () => startCountdownDisplay(scheduledStartAtMs));
+
+chrome.storage.sync.get(DEFAULT_CONFIG).then(async (config) => {
   writeForm(config);
+
+  const schedule = await chrome.storage.local.get({
+    scheduledStartAtMs: 0
+  }).catch(() => ({ scheduledStartAtMs: 0 }));
+  startCountdownDisplay(schedule.scheduledStartAtMs);
+
   refreshWorkflowStatus();
-  workflowStatusTimer = setInterval(refreshWorkflowStatus, 500);
+  workflowStatusTimer = window.setInterval(refreshWorkflowStatus, 500);
+});
+
+window.addEventListener("unload", () => {
+  if (countdownTimer) window.clearInterval(countdownTimer);
+  if (workflowStatusTimer) window.clearInterval(workflowStatusTimer);
 });

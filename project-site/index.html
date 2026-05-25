@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fast Target Clicker</title>
+    <meta name="description" content="Fast Target Clicker 專案入口，選擇 DOM / JavaScript Extension 或 Playwright Runner 版本。">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Fast Target Clicker">
+        <span class="mark">F</span>
+        <span>Fast Target Clicker</span>
+      </a>
+      <nav aria-label="主要導覽">
+        <a href="#versions">版本選擇</a>
+        <a href="practice/">練習站</a>
+        <a href="https://github.com/futeeeen/Fast-Target-Clicker">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Workflow automation toolkit</p>
+          <h1>依照使用情境，選擇適合的自動化執行版本。</h1>
+          <p class="lede">Fast Target Clicker 將可設定的多步驟 JSON 流程、指定時間啟動、等待目標元素、文字條件判斷與練習站整理成兩條產品線：瀏覽器擴充功能版，以及 Playwright Runner 版。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#versions">查看兩種版本</a>
+            <a class="button secondary" href="practice/">前往練習站</a>
+          </div>
+        </div>
+        <div class="hero-panel" aria-label="功能摘要">
+          <div class="panel-line">
+            <span>Scheduled start</span>
+            <strong>秒級倒數觸發</strong>
+          </div>
+          <div class="panel-line">
+            <span>Workflow JSON</span>
+            <strong>click / select / check / fill</strong>
+          </div>
+          <div class="panel-line">
+            <span>Smart matching</span>
+            <strong>selector + text conditions</strong>
+          </div>
+        </div>
+      </section>
+
+      <section id="versions" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Choose your runner</p>
+          <h2>兩種版本，對應不同使用方式</h2>
+        </div>
+
+        <div class="version-grid">
+          <article class="version-card accent-green">
+            <div>
+              <p class="tag">Chrome / Edge Extension</p>
+              <h3>DOM / JavaScript Runner</h3>
+              <p>安裝成瀏覽器擴充功能後，可固定在右側 Side Panel。適合你已經開著目標網頁，需要在指定時間從目前分頁直接執行 JSON 流程。</p>
+            </div>
+            <ul>
+              <li>使用目前分頁，不需要另外啟動瀏覽器。</li>
+              <li>支援開始倒數、取消倒數、從指定步驟開始。</li>
+              <li>適合手動開頁、現場快速調整 selector 與文字條件。</li>
+            </ul>
+            <a class="button primary" href="dom-js-runner/">查看 DOM Extension 介紹</a>
+          </article>
+
+          <article class="version-card accent-blue">
+            <div>
+              <p class="tag">Playwright CLI / Web UI</p>
+              <h3>Playwright Runner</h3>
+              <p>透過 Playwright 啟動瀏覽器並執行相同 JSON 流程。適合需要固定環境、可重複測試、用 UI 或 CLI 跑完整流程的情境。</p>
+            </div>
+            <ul>
+              <li>提供 Web UI，可填 URL、貼 JSON、設定 headless 與 slowMo。</li>
+              <li>支援秒級倒數、立即執行、流程狀態與事件紀錄。</li>
+              <li>適合自動化測試、練習站驗證、CLI 腳本化執行。</li>
+            </ul>
+            <a class="button primary" href="playwright-runner/">查看 Playwright Runner 介紹</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section quick-start">
+        <div class="section-heading">
+          <p class="eyebrow">Practice first</p>
+          <h2>先用練習站熟悉設定方式</h2>
+          <p>練習站包含多頁流程、相同文字按鈕、座位狀態、下拉選單、checkbox、延遲載入等常見情境，可用來測試兩個 runner 的 JSON 設定。</p>
+        </div>
+        <a class="button secondary" href="practice/">開啟練習站</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Fast Target Clicker</span>
+      <span>DOM Extension / Playwright Runner</span>
+    </footer>
+  </body>
+</html>

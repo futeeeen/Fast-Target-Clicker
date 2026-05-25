@@ -12,7 +12,7 @@
         <div>
           <p class="eyebrow">Fast Target Clicker</p>
           <h1>Playwright Runner UI</h1>
-          <p>用 UI 執行 Playwright workflow：填 URL、貼 JSON、設定起始步驟或指定時間，執行後即時查看狀態。</p>
+          <p>用 Playwright 執行多步驟流程，可設定目標網址、JSON 步驟、起始步驟，以及秒級指定時間倒數。</p>
         </div>
         <button id="loadExample" type="button">載入練習站範例</button>
       </section>
@@ -37,7 +37,7 @@
 
           <label>
             指定開始時間
-            <input id="startAt" name="startAt" type="datetime-local">
+            <input id="startAt" name="startAt" type="datetime-local" step="1">
           </label>
 
           <div class="checks">
@@ -58,13 +58,16 @@
 
           <div class="actions">
             <button type="submit">立刻執行</button>
+            <button id="startCountdown" type="button">開始倒數</button>
+            <button id="cancelCountdown" type="button">取消倒數</button>
             <button id="clearLog" type="button">清空狀態</button>
           </div>
         </form>
 
         <aside class="panel status-panel">
           <h2>執行狀態</h2>
-          <p id="statusText" class="status-text">尚未執行</p>
+          <p id="countdownText" class="countdown-text" aria-live="polite">尚未開始倒數</p>
+          <p id="statusText" class="status-text">準備就緒</p>
           <div id="eventLog" class="event-log" aria-live="polite"></div>
         </aside>
       </section>
