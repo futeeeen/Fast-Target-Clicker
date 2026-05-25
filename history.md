@@ -1,5 +1,12 @@
 # 專案推送變更紀錄
 
+## 2026.05.25_11:24:10
+* 將 Playwright Runner UI 的目標 URL 預設改為 `https://futeeeen.github.io/Fast-Target-Clicker/practice/`。
+* 修正「載入練習站範例」，改由 UI 後端讀取 `examples/practice-flow.json`，避免前端硬編碼範例與實際練習站不同步。
+* 更新 Playwright 練習站範例 JSON，改用穩定 selector 與 `5990` 條件，避免受頁面顯示文字編碼影響。
+* 更新 README 與 Playwright docs，將 CLI/config 範例同步指向公開練習站。
+* Validation: ran Playwright runner/UI syntax checks, parsed example JSON/config, started UI server, verified default URL and `/api/examples` response.
+
 ## 2026.05.25_11:02:34
 * 重新整理根目錄，拆成 `dom-js-runner`、`playwright-runner`、`test-site` 三個主要資料夾，保留根目錄 `README.md` 與 `history.md`。
 * 將 DOM / JavaScript 擴充功能版移到 `dom-js-runner/extension`，並將產品介紹頁移到 `dom-js-runner/docs`。

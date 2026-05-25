@@ -1,19 +1,3 @@
-const defaultWorkflow = [
-  { type: "click", selector: "#firstButton" },
-  { type: "click", text: "趕快點我" },
-  { type: "click", selector: "#secondButton" },
-  {
-    type: "click",
-    selector: "div.seat-item",
-    textIncludes: ["特C區", "5990"],
-    textExcludes: ["已售完"],
-    waitForMs: 10000
-  },
-  { type: "select", selector: "#ticketCount", value: "2" },
-  { type: "check", selector: "#agreeTerms" },
-  { type: "click", selector: "#finishButton" }
-];
-
 const form = document.querySelector("#runForm");
 const workflowText = document.querySelector("#workflowText");
 const statusText = document.querySelector("#statusText");
@@ -24,8 +8,16 @@ const clearLog = document.querySelector("#clearLog");
 let pollTimer = 0;
 let lastEventCount = 0;
 
-function setExample() {
-  workflowText.value = JSON.stringify(defaultWorkflow, null, 2);
+async function setExample() {
+  try {
+    const response = await fetch("/api/examples");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "載入範例失敗");
+    workflowText.value = data.practiceFlow;
+    statusText.textContent = "已載入練習站範例";
+  } catch (error) {
+    statusText.textContent = error.message;
+  }
 }
 
 function appendEvent(event) {

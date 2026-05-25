@@ -1,5 +1,5 @@
 {
-  "url": "http://127.0.0.1:4173/test-site/index.html",
+  "url": "https://futeeeen.github.io/Fast-Target-Clicker/practice/",
   "workflowPath": "examples/practice-flow.json",
   "startStep": 1,
   "headless": false,

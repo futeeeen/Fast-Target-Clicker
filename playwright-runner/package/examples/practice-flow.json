@@ -5,7 +5,7 @@
   },
   {
     "type": "click",
-    "text": "趕快點我"
+    "selector": "#quickButtons .quick-button"
   },
   {
     "type": "click",
@@ -14,8 +14,9 @@
   {
     "type": "click",
     "selector": "div.seat-item",
-    "textIncludes": ["特C區", "5990"],
-    "textExcludes": ["已售完"],
+    "textIncludes": [
+      "5990"
+    ],
     "waitForMs": 10000
   },
   {

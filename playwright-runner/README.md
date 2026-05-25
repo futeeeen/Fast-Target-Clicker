@@ -23,4 +23,4 @@ npm run ui
 http://127.0.0.1:4280
 ```
 
-UI 可以填 URL、貼 workflow JSON、設定指定時間、起始步驟、slowMo、headless，並查看執行狀態。
+UI 可以填 URL、貼 workflow JSON、設定指定時間、起始步驟、slowMo、headless，並查看執行狀態。預設 URL 是公開練習站 `https://futeeeen.github.io/Fast-Target-Clicker/practice/`。
