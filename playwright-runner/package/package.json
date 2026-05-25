@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node src/runner.mjs",
     "ui": "node ../ui/server.mjs",
-    "check": "node --check src/runner.mjs"
+    "check": "node --check src/runner.mjs",
+    "build:portable": "powershell -ExecutionPolicy Bypass -File ../portable/build-windows.ps1"
   },
   "dependencies": {
     "playwright": "^1.52.0"

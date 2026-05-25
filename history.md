@@ -1,4 +1,11 @@
 # 專案推送變更紀錄
+## 2026.05.25_19:01:42
+* 新增 Playwright Runner Windows 可攜式 exe 打包流程，透過 `playwright-runner/portable/build-windows.ps1` 產生可交付資料夾。
+* 新增 `FastTargetClicker.exe` 啟動器來源，啟動時會使用內附 Node runtime 跑 Playwright UI server，並自動開啟 `http://127.0.0.1:4280`。
+* 更新 Playwright Runner package scripts 與 README，新增 `npm run build:portable` 使用說明。
+* 新增 `playwright-runner/.gitignore` 排除大型 `dist/` 打包產物。
+* Validation: ran Node syntax checks, built the portable package, launched the generated exe, verified the UI responded, and compressed the package to zip.
+
 ## 2026.05.25_13:29:32
 * 修正根目錄 `README.md` 在 GitHub 顯示亂碼的問題，重寫為 UTF-8 可讀中文內容。
 * 同步修正 `playwright-runner/docs/README.md` 與 `playwright-runner/package/README.md` 的亂碼，讓 Playwright Runner 文件維持一致。

@@ -28,6 +28,25 @@ UI 預設目標 URL：
 https://futeeeen.github.io/Fast-Target-Clicker/practice/
 ```
 
+## 打包成 Windows 可攜式 exe
+
+在有 Node/npm 的開發機上執行：
+
+```powershell
+cd playwright-runner/package
+npm run build:portable
+```
+
+輸出位置：
+
+```text
+playwright-runner/dist/FastTargetClicker-Playwright-Windows/
+```
+
+交付給沒有程式背景的使用者時，請把整個 `FastTargetClicker-Playwright-Windows` 資料夾壓縮後提供。使用者解壓縮後雙擊 `FastTargetClicker.exe`，瀏覽器會自動開啟 Playwright Runner UI。
+
+注意：不要只提供單一 exe，`app` 與 `ms-playwright` 資料夾必須和 exe 放在同一層。
+
 ## CLI 執行
 
 ```powershell
